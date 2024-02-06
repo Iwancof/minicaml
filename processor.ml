@@ -43,6 +43,11 @@ type value =
   | IntVal of int
   | BoolVal of bool
 
+let rec value_to_string v = 
+  match v with
+  | IntVal(i) -> string_of_int i
+  | BoolVal(b) -> string_of_bool b
+
 let rec exp_to_string e = 
   match e with
   | IntLit(i) -> string_of_int i

@@ -8,6 +8,10 @@
 *.cmxs
 *.cmxa
 
+my*
+
+miniocaml
+
 # ocamlbuild working directory
 _build/
 

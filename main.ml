@@ -1,7 +1,8 @@
 (* main.ml *)
 
 (* 構文定義ファイル syntax.ml で定義された exp型を使う *)
-open Mysyntax ;;
+open Syntax ;;
+open Eval ;;
 
 (* 与えられた文字列の字句解析と構文解析だけを行う関数 *)
 (* parse : string -> exp *)
@@ -9,6 +10,14 @@ open Mysyntax ;;
 let parse str = 
   Myparser.main Mylexer.token 
     (Lexing.from_string str)
+
+let dump str = 
+  let e = parse str in
+  Eval.exp_to_string e;;
+
+let eval str = 
+  let e = parse str in
+  Eval.eval e (Eval.emptyenv ());;
 
 (* 使用例は以下の通り。parse関数は Mainモジュールにはいっているので
    open Main;; parse "...";; とするか Main.parse "...";;

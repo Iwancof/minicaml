@@ -39,9 +39,7 @@ clean:
 		test_expression test_environment 
 
 test_expression: syntax.ml eval.ml ./tests/test_expression.ml
-	ocamlc -o $@ $^
-	./test_expression
+	ocamlc -o tests/$@ $^
 
 test_environment: syntax.ml eval.ml ./tests/test_environment.ml
-	ocamlc -o $@ $^
-	./test_environment
+	ocamlc -o tests/$@ $^

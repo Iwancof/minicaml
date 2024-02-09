@@ -2,10 +2,9 @@ open Eval;;
 open Syntax;;
 
 let test_bool b =
-  if b then "OK\n" else "FAIL\n";;
+  if b then "OK\n" else exit(1);;
 
-let test_int value int =
-  test_bool (value = IntVal(int));;
+let test_int value int = test_bool (value = IntVal(int));;
 
 (* using x *)
 print_string (test_int (eval (Let("x", IntLit(3), Var("x"))) (emptyenv ())) 3);;
@@ -38,4 +37,4 @@ let e =
 
 print_string (test_int (eval e (emptyenv ())) 4);;
 
-print_string "All tests passed.\n";;
+exit(0);;

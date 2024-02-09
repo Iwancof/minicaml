@@ -4,7 +4,7 @@ open Syntax;;
 let add_plus_2 e = Plus(e, IntLit(2));;
 
 let test_bool b =
-  if b then "OK\n" else "FAIL\n";;
+  if b then "OK\n" else exit(1);;
 
 let eval_with_empty_env e = eval e (emptyenv ());;
 
@@ -25,6 +25,6 @@ print_string (test_bool ((eval_with_empty_env (If(LessEq(IntLit(2), IntLit(1)), 
 print_string (test_bool ((eval_with_empty_env (If(And(BoolLit(true), BoolLit(true)), IntLit(1), IntLit(2))) = IntVal(1))));;
 print_string (test_bool ((eval_with_empty_env (If(And(BoolLit(true), BoolLit(false)), IntLit(1), IntLit(2))) = IntVal(2))));;
 print_string (test_bool ((eval_with_empty_env (If(Or(BoolLit(true), BoolLit(false)), IntLit(1), IntLit(2))) = IntVal(1))));;
-print_string (test_bool ((eval_with_empty_env (If(Or(BoolLit(false), BoolLit(false)), IntLit(1), IntLit(2))) = IntVal(2))));;
+print_string (test_bool ((eval_with_empty_env (If(Or(BoolLit(false), BoolLit(false)), IntLit(1), IntLit(2))) = IntVal(3))));;
 
-print_string "All tests passed.\n";;
+exit(0);;

@@ -1,21 +1,63 @@
+#
+# Makefile
+#
 
-.PHONY: processor main test_expression clean
+SRC= mysyntax.ml myparser.mly mylexer.mll eval.ml main.ml 
+COMPONENT= mysyntax.ml myparser.mli myparser.ml mylexer.ml eval.ml main.ml 
+TARGET= miniocaml
 
-processor: processor.ml
-	ocamlc -c processor.ml
+.DEFAULT_GOAL := $(TARGET)
+.PHONY: clean test_expression test_environment
 
-main: processor main.ml
-	ocamlc -o main processor.cmo main.ml
+all:	$(TARGET)
 
-test_expression: processor test_expression.ml
-	ocamlc -o test_expression processor.cmo test_expression.ml
-	./test_expression
+$(TARGET): 	$(COMPONENT) 
+	ocamlmktop $(COMPONENT) -w -31 -o $(TARGET)
 
-test_environment: processor test_environment.ml
-	ocamlc -o test_environment processor.cmo test_environment.ml
-	./test_environment
+parser.mly:
+	wget https://www.logic.cs.tsukuba.ac.jp/jikken/parser.mly
+
+lexer.mll:
+	wget https://www.logic.cs.tsukuba.ac.jp/jikken/lexer.mll
+
+syntax.ml:
+	wget https://www.logic.cs.tsukuba.ac.jp/jikken/syntax.ml
+
+myparser.mly: parser.mly
+	sed -e 's/Syntax/Mysyntax/g' parser.mly > myparser.mly
+
+mylexer.mll: lexer.mll
+	sed -e 's/Parser/Myparser/g' lexer.mll > mylexer.mll
+
+mysyntax.ml: syntax.ml
+	cp syntax.ml mysyntax.ml
+
+myparser.mli:	myparser.mly
+	ocamlyacc myparser.mly
+
+myparser.ml:	myparser.mly
+	ocamlyacc myparser.mly
+
+mylexer.ml:	mylexer.mll
+	ocamllex mylexer.mll
 
 clean:
-	rm -f *.cmo *.cmi main test_expression test_environment
+	/bin/rm -f \
+		myparser.ml myparser.mly myparser.mli \
+		mylexer.ml mylexer.mll \
+		mysyntax.ml \
+		$(TARGET) \
+		*.cmi *.cmo *.mli \
+		test_expression test_environment 
 
-.DEFAULT_GOAL := main
+clean_all: clean
+	/bin/rm -f \
+		parser.mly lexer.mll syntax.ml
+
+test_expression: processor.ml test_expression.ml
+	ocamlc -o $@ $^
+	./test_expression
+
+test_environment: processor.ml test_environment.ml
+	ocamlc -o $@ $^
+	./test_environment

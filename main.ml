@@ -15,7 +15,7 @@ let dump str =
   let e = parse str in
   Eval.exp_to_string e;;
 
-let eval str = 
+let run str = 
   let e = parse str in
   Eval.eval e (Eval.emptyenv ());;
 

@@ -1,4 +1,5 @@
-open Processor;;
+open Eval;;
+open Syntax;;
 
 let add_plus_2 e = Plus(e, IntLit(2));;
 
@@ -15,10 +16,10 @@ print_string (test_bool ((eval_with_empty_env (If(BoolLit(true), IntLit(1), IntL
 print_string (test_bool ((eval_with_empty_env (If(BoolLit(false), IntLit(1), IntLit(2))) = IntVal(2))));;
 print_string (test_bool ((eval_with_empty_env (If(Eq(IntLit(1), IntLit(1)), IntLit(1), IntLit(2))) = IntVal(1))));;
 print_string (test_bool ((eval_with_empty_env (If(Eq(IntLit(1), IntLit(2)), IntLit(1), IntLit(2))) = IntVal(2))));;
-print_string (test_bool ((eval_with_empty_env (If(LessThan(IntLit(1), IntLit(2)), IntLit(1), IntLit(2))) = IntVal(1))));;
-print_string (test_bool ((eval_with_empty_env (If(LessThan(IntLit(2), IntLit(1)), IntLit(1), IntLit(2))) = IntVal(2))));;
-print_string (test_bool ((eval_with_empty_env (If(GreaterThan(IntLit(2), IntLit(1)), IntLit(1), IntLit(2))) = IntVal(1))));;
-print_string (test_bool ((eval_with_empty_env (If(GreaterThan(IntLit(1), IntLit(2)), IntLit(1), IntLit(2))) = IntVal(2))));;
+print_string (test_bool ((eval_with_empty_env (If(Less(IntLit(1), IntLit(2)), IntLit(1), IntLit(2))) = IntVal(1))));;
+print_string (test_bool ((eval_with_empty_env (If(Less(IntLit(2), IntLit(1)), IntLit(1), IntLit(2))) = IntVal(2))));;
+print_string (test_bool ((eval_with_empty_env (If(Greater(IntLit(2), IntLit(1)), IntLit(1), IntLit(2))) = IntVal(1))));;
+print_string (test_bool ((eval_with_empty_env (If(Greater(IntLit(1), IntLit(2)), IntLit(1), IntLit(2))) = IntVal(2))));;
 print_string (test_bool ((eval_with_empty_env (If(LessEq(IntLit(1), IntLit(1)), IntLit(1), IntLit(2))) = IntVal(1))));;
 print_string (test_bool ((eval_with_empty_env (If(LessEq(IntLit(2), IntLit(1)), IntLit(1), IntLit(2))) = IntVal(2))));;
 print_string (test_bool ((eval_with_empty_env (If(And(BoolLit(true), BoolLit(true)), IntLit(1), IntLit(2))) = IntVal(1))));;

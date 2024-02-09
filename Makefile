@@ -37,10 +37,10 @@ clean:
 		*.cmi *.cmo *.mli \
 		test_expression test_environment 
 
-test_expression: processor.ml test_expression.ml
+test_expression: syntax.ml eval.ml ./tests/test_expression.ml
 	ocamlc -o $@ $^
 	./test_expression
 
-test_environment: processor.ml test_environment.ml
+test_environment: syntax.ml eval.ml ./tests/test_environment.ml
 	ocamlc -o $@ $^
 	./test_environment

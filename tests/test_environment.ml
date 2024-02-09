@@ -1,4 +1,5 @@
-open Processor;;
+open Eval;;
+open Syntax;;
 
 let test_bool b =
   if b then "OK\n" else "FAIL\n";;
@@ -36,3 +37,5 @@ let e =
   Var("x")));;
 
 print_string (test_int (eval e (emptyenv ())) 4);;
+
+print_string "All tests passed.\n";;

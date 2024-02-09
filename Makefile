@@ -34,6 +34,7 @@ clean:
 		myparser.ml myparser.mly myparser.mli \
 		mylexer.ml mylexer.mll \
 		$(TARGET) \
+		**/*.cmi **/*.cmo **/*.mli \
 		*.cmi *.cmo *.mli \
 		test_expression test_environment 
 

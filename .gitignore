@@ -12,6 +12,8 @@ my*
 
 miniocaml
 
+./.secret
+
 # ocamlbuild working directory
 _build/
 

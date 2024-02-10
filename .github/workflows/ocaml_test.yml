@@ -1,17 +1,13 @@
 name: OCaml CI
 
-on: [push, pull_request]
+on: [push]
 
 jobs:
   build:
-    runs-on: ubuntu-latest
+    runs-on: self-hosted
 
     steps:
     - uses: actions/checkout@v2
-    - name: Setup OCaml
-      uses: ocaml/setup-ocaml@v2
-      with:
-        ocaml-compiler: '5.1.0'
     - name: test environment
       run: make test_environment && ./tests/test_environment
     - name: test expression

@@ -61,9 +61,18 @@ let rec eval e env =
     match v with
     | BoolVal(b) -> b
     | _ -> failwith "Type error(expect_bool)" in
-  let rec int_binop f e1 e2 = IntVal(f (expect_int (eval_env e1)) (expect_int (eval_env e2))) in
-  let rec int_comp f e1 e2 = BoolVal(f (expect_int (eval_env e1)) (expect_int (eval_env e2))) in
-  let rec bool_binop f e1 e2 = BoolVal(f (expect_bool (eval_env e1)) (expect_bool (eval_env e2))) in
+  let rec int_binop f second first = 
+    let first = expect_int (eval_env first) in
+    let second = expect_int (eval_env second) in
+    IntVal(f second first) in
+  let rec int_comp f second first = 
+    let first = expect_int (eval_env first) in
+    let second = expect_int (eval_env second) in
+    BoolVal(f second first) in
+  let rec bool_binop f second first = 
+    let first = expect_bool (eval_env first) in
+    let second = expect_bool (eval_env second) in
+    BoolVal(f second first) in
 
   match e with
   | IntLit(i) -> IntVal(i)
@@ -80,14 +89,14 @@ let rec eval e env =
   | Not(e1) -> BoolVal(not (expect_bool (eval_env e1)))
 
   | Eq(e1, e2) -> 
-    (match (eval_env e1, eval_env e2) with
-    | (IntVal(i1), IntVal(i2)) -> BoolVal(i1 = i2)
-    | (BoolVal(b1), BoolVal(b2)) -> BoolVal(b1 = b2)
+    (match (eval_env e2, eval_env e1) with
+    | (IntVal(i2), IntVal(i1)) -> BoolVal(i1 = i2)
+    | (BoolVal(b2), BoolVal(b1)) -> BoolVal(b1 = b2)
     | _ -> failwith "Type error(Eq)")
   | Neq(e1, e2) ->
-    (match (eval_env e1, eval_env e2) with
-    | (IntVal(i1), IntVal(i2)) -> BoolVal(i1 <> i2)
-    | (BoolVal(b1), BoolVal(b2)) -> BoolVal(b1 <> b2)
+    (match (eval_env e2, eval_env e1) with
+    | (IntVal(i2), IntVal(i1)) -> BoolVal(i1 <> i2)
+    | (BoolVal(b2), BoolVal(b1)) -> BoolVal(b1 <> b2)
     | _ -> failwith "Type error(Neq)")
   | Less(e1, e2) -> int_comp ( < ) e1 e2
   | Greater(e1, e2) -> int_comp ( > ) e1 e2
@@ -114,10 +123,12 @@ let rec eval e env =
     | _ -> failwith "Type error(Tail)")
   | Empty -> (ListVal([]))
   | Fun(s, e1) -> FunVal(s, e1, env)
+  | LetRec(func_name, arg, body, expr) -> (eval expr (ext env func_name (RecFunVal(func_name, arg, body, env)))) (* evaludating expr needs recursive function *)
   | App(f, arg) -> 
-    (match (eval_env f) with
-    | FunVal(x, func_body, bind_env) ->
-        let arg = eval arg env in (* evaluate the argument *)
-        eval func_body (ext bind_env x arg) (* evaluate the function body with the argument *)
-    | _ -> failwith "Type error(App)")
+      let arg = eval arg env in (* before evaluating the function body, evaluate the argument *)
+      let f = eval_env f in (* evaluate the function *)
+      (match f with
+      | FunVal(x, func_body, bind_env) -> eval func_body (ext bind_env x arg) (* evaluate the function body with the argument *)
+      | RecFunVal(func_name, x, func_body, bind_env) -> eval func_body (ext (ext bind_env func_name f) x arg) (* evaluating the recursive function needs to bind the function itself *)
+      | _ -> failwith "Type error(App)")
   | _ -> failwith "Not implemented"

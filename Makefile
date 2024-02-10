@@ -5,9 +5,10 @@
 SRC= syntax.ml myparser.mly mylexer.mll eval.ml main.ml 
 COMPONENT= syntax.ml myparser.mli myparser.ml mylexer.ml eval.ml main.ml 
 TARGET= miniocaml
+TESTS= test_expression test_environment test_parse_and_run test_function test_recursive_function
 
 .DEFAULT_GOAL := $(TARGET)
-.PHONY: clean test_expression test_environment test_parse_and_run test_function
+.PHONY: clean $(TESTS)
 
 all:	$(TARGET)
 
@@ -36,7 +37,8 @@ clean:
 		$(TARGET) \
 		**/*.cmi **/*.cmo **/*.mli \
 		*.cmi *.cmo *.mli \
-		./tests/test_expression ./tests/test_environment ./tests/test_parse_and_run ./tests/test_function
+		$(foreach test, $(TESTS), tests/$(test))
+		
 
 test_expression: syntax.ml eval.ml ./tests/test_expression.ml
 	ocamlc -o tests/$@ $^
@@ -48,4 +50,7 @@ test_parse_and_run: syntax.ml myparser.mli myparser.ml mylexer.ml eval.ml ./test
 	ocamlc -o tests/$@ $^
 
 test_function: syntax.ml myparser.mli myparser.ml mylexer.ml eval.ml ./tests/test_function.ml
+	ocamlc -o tests/$@ $^
+
+test_recursive_function: syntax.ml myparser.mli myparser.ml mylexer.ml eval.ml ./tests/test_recursive_function.ml
 	ocamlc -o tests/$@ $^

@@ -30,10 +30,10 @@ type exp =
   (* Variables *)
   | Var of string
   | Let of string * exp * exp
-  | LetRec of string * string * exp * exp
 
   (* Functions *)
   | Fun of string * exp
+  | LetRec of string * string * exp * exp
   | App of exp * exp
 
   (* Lists *)

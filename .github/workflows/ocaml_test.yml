@@ -16,3 +16,5 @@ jobs:
       run: make test_parse_and_run && ./tests/test_parse_and_run
     - name: test function
       run: make test_function && ./tests/test_function
+    - name: test recursive function
+      run: make test_recursive_function && ./tests/test_recursive_function

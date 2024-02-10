@@ -23,6 +23,8 @@ rule token = parse
   | '='       { EQUAL }
   | '<'       { LESS }
   | '>'       { GREATER }
+  | "<="      { LESSEQ }
+  | ">="      { GREATEREQ }
   | ';'       { SEMICOL }
   | "::"      { COLCOL }
 

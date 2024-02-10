@@ -9,40 +9,42 @@ open Syntax
 %token <int> INT     // 0, 1, 2, ...
 
 // 演算子
-%token PLUS     // '+'
-%token MINUS    // '-'
-%token ASTERISK // '*'
-%token SLASH    // '/'
-%token EQUAL    // '='
-%token LESS     // '<'
-%token GREATER  // '>'
-%token COLCOL   // "::"
+%token PLUS       // '+'
+%token MINUS      // '-'
+%token ASTERISK   // '*'
+%token SLASH      // '/'
+%token EQUAL      // '='
+%token LESS       // '<'
+%token GREATER    // '>'
+%token LESSEQ     // "<="
+%token GREATEREQ  // ">="
+%token COLCOL     // "::"
 
 // 括弧類
-%token LPAREN   // '('
-%token RPAREN   // ')'
-%token LBRA     // '['
-%token RBRA     // ']'
+%token LPAREN     // '('
+%token RPAREN     // ')'
+%token LBRA       // '['
+%token RBRA       // ']'
 
 // 区切り記号
-%token ARROW    // "->"
-%token VBAR     // '|'
-%token SEMICOL  // ';'
+%token ARROW      // "->"
+%token VBAR       // '|'
+%token SEMICOL    // ';'
 
 // キーワード
-%token TRUE     // "true"
-%token FALSE    // "false"
-%token FUN      // "fun"
-%token LET      // "let"
-%token REC      // "rec"
-%token IN       // "in"
-%token IF       // "if"
-%token THEN     // "then"
-%token ELSE     // "else"
-%token MATCH    // "match"
-%token WITH     // "with"
-%token HEAD     // "List.hd"
-%token TAIL     // "List.tl"
+%token TRUE       // "true"
+%token FALSE      // "false"
+%token FUN        // "fun"
+%token LET        // "let"
+%token REC        // "rec"
+%token IN         // "in"
+%token IF         // "if"
+%token THEN       // "then"
+%token ELSE       // "else"
+%token MATCH      // "match"
+%token WITH       // "with"
+%token HEAD       // "List.hd"
+%token TAIL       // "List.tl"
 
 // 制御記号
 %token EOF 
@@ -51,7 +53,7 @@ open Syntax
 %nonassoc IN ELSE ARROW WITH
 %left VBAR
 %left SEMICOL
-%left EQUAL GREATER LESS
+%left EQUAL GREATER LESS LESSEQ GREATEREQ
 %right COLCOL
 %left PLUS MINUS
 %left ASTERISK SLASH
@@ -140,6 +142,12 @@ exp:
   // e1 > e2
   | exp GREATER exp
     { Greater ($1, $3) }
+
+  | exp LESSEQ exp
+    { LessEq ($1, $3) }
+
+  | exp GREATEREQ exp
+    { GreaterEq ($1, $3) }
     
   // e1 :: e2
   | exp COLCOL exp

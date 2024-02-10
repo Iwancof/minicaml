@@ -54,3 +54,9 @@ test_function: syntax.ml myparser.mli myparser.ml mylexer.ml eval.ml ./tests/tes
 
 test_recursive_function: syntax.ml myparser.mli myparser.ml mylexer.ml eval.ml ./tests/test_recursive_function.ml
 	ocamlc -o tests/$@ $^
+
+test: $(TESTS)
+	@for test in $(TESTS); do \
+		echo "Running test $$test"; \
+		./tests/$$test; \
+	done

@@ -7,7 +7,7 @@ COMPONENT= syntax.ml myparser.mli myparser.ml mylexer.ml eval.ml main.ml
 TARGET= miniocaml
 
 .DEFAULT_GOAL := $(TARGET)
-.PHONY: clean test_expression test_environment
+.PHONY: clean test_expression test_environment test_parse_and_run test_function
 
 all:	$(TARGET)
 
@@ -36,10 +36,16 @@ clean:
 		$(TARGET) \
 		**/*.cmi **/*.cmo **/*.mli \
 		*.cmi *.cmo *.mli \
-		test_expression test_environment 
+		./tests/test_expression ./tests/test_environment ./tests/test_parse_and_run ./tests/test_function
 
 test_expression: syntax.ml eval.ml ./tests/test_expression.ml
 	ocamlc -o tests/$@ $^
 
 test_environment: syntax.ml eval.ml ./tests/test_environment.ml
+	ocamlc -o tests/$@ $^
+
+test_parse_and_run: syntax.ml myparser.mli myparser.ml mylexer.ml eval.ml ./tests/test_parse_and_run.ml
+	ocamlc -o tests/$@ $^
+
+test_function: syntax.ml myparser.mli myparser.ml mylexer.ml eval.ml ./tests/test_function.ml
 	ocamlc -o tests/$@ $^

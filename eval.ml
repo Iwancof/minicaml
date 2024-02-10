@@ -113,4 +113,11 @@ let rec eval e env =
     | ListVal(h :: t) -> ListVal(t)
     | _ -> failwith "Type error(Tail)")
   | Empty -> (ListVal([]))
+  | Fun(s, e1) -> FunVal(s, e1, env)
+  | App(f, arg) -> 
+    (match (eval_env f) with
+    | FunVal(x, func_body, bind_env) ->
+        let arg = eval arg env in (* evaluate the argument *)
+        eval func_body (ext bind_env x arg) (* evaluate the function body with the argument *)
+    | _ -> failwith "Type error(App)")
   | _ -> failwith "Not implemented"

@@ -12,3 +12,7 @@ jobs:
       run: make test_environment && ./tests/test_environment
     - name: test expression
       run: make test_expression && ./tests/test_expression
+    - name: test parse and run
+      run: make test_parse_and_run && ./tests/test_parse_and_run
+    - name: test function
+      run: make test_function && ./tests/test_function

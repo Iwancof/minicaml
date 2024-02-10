@@ -111,7 +111,7 @@ exp:
   
   // 符号の反転 -e
   | MINUS exp %prec UNARY
-    { Minus (IntLit 0, $2) }
+    { Neg ($2) }
   
   // e1 + e2
   | exp PLUS exp

@@ -16,6 +16,7 @@ let test_bool b =
   if b then "OK\n" else exit(1);;
 
 print_string (test_bool (run "1" = IntVal 1));;
+print_string (test_bool (run "-1" = IntVal (-1)));;
 print_string (test_bool (run ("1 + 2 * 3") = IntVal 7));;
 print_string (test_bool (run ("(1 + 2) * 3") = IntVal 9));;
 print_string (test_bool (run ("(1 + 2) * (3 + 4)") = IntVal 21));;

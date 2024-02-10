@@ -133,6 +133,13 @@ let rec eval e env =
       | not_func -> NotAFunctionErr(not_func, arg))
   | _ -> Unimplemented("Not implemented(" ^ (exp_to_string e) ^ ")")
 
+(* TODO
+let error_by_to_string by =
+  match by with
+  | Plus -> "+"
+  ...
+*)
+
 let rec value_to_string v = 
   match v with
   | IntVal(i) -> string_of_int i

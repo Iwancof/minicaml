@@ -42,6 +42,13 @@ type exp =
   | Tail of exp
   | Empty
 
+(* TODO
+type error_by = 
+  | Plus
+  | Minus
+  ...
+*)
+
 type value = 
   | IntVal of int
   | BoolVal of bool

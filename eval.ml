@@ -1,12 +1,13 @@
 open Syntax;;
 
-let emptyenv() = [];;
+let emptyenv () = Hashtbl.create 10;;
 
-let ext env x v = (x, v) :: env;;
+let break_ext env x v = Hashtbl.add env x v; env
+let snapshot env = Hashtbl.copy env
 
-let rec lookup x env = match env with
-  | [] -> raise (Failure ("unbound variable: " ^ x))
-  | (y, v) :: rest -> if x = y then v else lookup x rest;;
+let lookup x env =
+  try Hashtbl.find env x
+  with Not_found -> raise (Failure ("unbound variable: " ^ x));;
 
 let rec value_to_string v = 
   match v with
@@ -108,7 +109,7 @@ let rec eval e env =
       | BoolVal(false) -> eval_env e3
       | _ -> failwith "Type error(If)")
   | Var(s) -> (lookup (s) env)
-  | Let(s, e1, e2) -> (eval e2 (ext env s (eval e1 env)))
+  | Let(s, e1, e2) -> (eval e2 (break_ext env s (eval e1 env)))
   | Cons(e1, e2) -> 
     (match (eval_env e2) with
     | ListVal(l) -> ListVal((eval_env e1) :: l)
@@ -122,13 +123,17 @@ let rec eval e env =
     | ListVal(h :: t) -> ListVal(t)
     | _ -> failwith "Type error(Tail)")
   | Empty -> (ListVal([]))
-  | Fun(s, e1) -> FunVal(s, e1, env)
-  | LetRec(func_name, arg, body, expr) -> (eval expr (ext env func_name (RecFunVal(func_name, arg, body, env)))) (* evaludating expr needs recursive function *)
+  | Fun(s, e1) -> FunVal(s, e1, snapshot env)
+  | LetRec(func_name, arg, body, expr) -> (eval expr (break_ext env func_name (RecFunVal(func_name, arg, body, snapshot env)))) (* evaludating expr needs recursive function *)
   | App(f, arg) -> 
       let arg = eval arg env in (* before evaluating the function body, evaluate the argument *)
       let f = eval_env f in (* evaluate the function *)
       (match f with
-      | FunVal(x, func_body, bind_env) -> eval func_body (ext bind_env x arg) (* evaluate the function body with the argument *)
-      | RecFunVal(func_name, x, func_body, bind_env) -> eval func_body (ext (ext bind_env func_name f) x arg) (* evaluating the recursive function needs to bind the function itself *)
+      | FunVal(x, func_body, bind_env) -> 
+          eval func_body 
+          (break_ext (snapshot bind_env) x arg) (* evaluate the function body with the argument *)
+      | RecFunVal(func_name, x, func_body, bind_env) -> 
+          eval func_body 
+          (break_ext (break_ext (snapshot bind_env) func_name f) x arg) (* evaluating the recursive function needs to bind the function itself *)
       | _ -> failwith "Type error(App)")
   | _ -> failwith "Not implemented"

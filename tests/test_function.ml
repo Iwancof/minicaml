@@ -46,8 +46,5 @@ let f = fun g -> g 3 in
     f g
 " = IntVal 4));;
 
-(* recursive function *)
-(* TODO: fix this *)
-
 exit(0);;
 

@@ -48,5 +48,5 @@ type value =
   | ListVal of value list
   | FunVal of string * exp * env
   | RecFunVal of string * string * exp * env
-and env = (string * value) list
+and env = (string, value) Hashtbl.t
 

@@ -14,6 +14,7 @@ open Syntax
 %token ASTERISK   // '*'
 %token SLASH      // '/'
 %token EQUAL      // '='
+%token NEQ        // "<>"
 %token LESS       // '<'
 %token GREATER    // '>'
 %token LESSEQ     // "<="
@@ -57,7 +58,7 @@ open Syntax
 %left ANDAND BARBAR
 %left SEMICOL
 %left VBAR
-%left EQUAL GREATER LESS LESSEQ GREATEREQ
+%left EQUAL NEQ GREATER LESS LESSEQ GREATEREQ
 %right COLCOL
 %left PLUS MINUS
 %left ASTERISK SLASH
@@ -138,6 +139,10 @@ exp:
   // e1 = e2
   | exp EQUAL exp
     { Eq ($1, $3) }
+
+  // e1 <> e2
+  | exp NEQ exp
+    { Neq($1, $3) }
   
   // e1 < e2
   | exp LESS exp

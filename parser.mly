@@ -18,6 +18,9 @@ open Syntax
 %token GREATER    // '>'
 %token LESSEQ     // "<="
 %token GREATEREQ  // ">="
+%token ANDAND     // "&&"
+%token BARBAR     // "||"
+%token TILDE      // '~'
 %token COLCOL     // "::"
 
 // 括弧類
@@ -51,8 +54,9 @@ open Syntax
 
 // 演算子優先順位 (優先度の低いものほど先)
 %nonassoc IN ELSE ARROW WITH
-%left VBAR
+%left ANDAND BARBAR
 %left SEMICOL
+%left VBAR
 %left EQUAL GREATER LESS LESSEQ GREATEREQ
 %right COLCOL
 %left PLUS MINUS
@@ -148,6 +152,15 @@ exp:
 
   | exp GREATEREQ exp
     { GreaterEq ($1, $3) }
+
+  | exp ANDAND exp
+    { And ($1, $3) }
+
+  | exp BARBAR exp
+    { Or ($1, $3) }
+
+  | TILDE exp %prec UNARY
+    { Not ($2) }
     
   // e1 :: e2
   | exp COLCOL exp

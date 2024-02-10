@@ -24,6 +24,15 @@ print_string (test_bool (run ("if 1 < 2 then 3 else 4") = IntVal 3));;
 print_string (test_bool (run ("if 1 > 2 then 3 else 4") = IntVal 4));;
 print_string (test_bool (run ("if 1 <= 2 then 3 else 4") = IntVal 3));;
 print_string (test_bool (run ("if 1 >= 2 then 3 else 4") = IntVal 4));;
+
+print_string (test_bool (run ("if 1 = 2 && 3 = 4 then 3 else 4") = IntVal 4));;
+print_string (test_bool (run ("if 1 = 2 || 3 = 4 then 3 else 4") = IntVal 4));;
+print_string (test_bool (run ("if 1 = 1 && 3 = 4 then 3 else 4") = IntVal 4));;
+print_string (test_bool (run ("if 1 = 1 || 3 = 4 then 3 else 4") = IntVal 3));;
+
+print_string (test_bool (run ("if ~true then 3 else 4") = IntVal 4));;
+print_string (test_bool (run ("if ~(1 = 1) then 3 else 4") = IntVal 4));;
+
 print_string (test_bool (run ("let x = 1 in x + 2") = IntVal 3));;
 print_string (test_bool (run ("let x = 1 in let y = 2 in x + y") = IntVal 3));;
 print_string (test_bool (run ("let x = 1 in let y = 2 in x + y * x") = IntVal 3));;

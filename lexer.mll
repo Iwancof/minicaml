@@ -25,6 +25,9 @@ rule token = parse
   | '>'       { GREATER }
   | "<="      { LESSEQ }
   | ">="      { GREATEREQ }
+  | "&&"      { ANDAND }
+  | "||"      { BARBAR }
+  | '~'       { TILDE }
   | ';'       { SEMICOL }
   | "::"      { COLCOL }
 

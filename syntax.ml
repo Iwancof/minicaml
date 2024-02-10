@@ -48,5 +48,11 @@ type value =
   | ListVal of value list
   | FunVal of string * exp * env
   | RecFunVal of string * string * exp * env
+  | DivByZeroErr of value (* value / 0 occurs *)
+  | BinOpTypeErr of (string * value * value)
+  | UnOpTypeErr of (string * value)
+  | IfTypeErr of value
+  | NotAFunctionErr of value * value
+  | Unimplemented of string
 and env = (string, value) Hashtbl.t
 

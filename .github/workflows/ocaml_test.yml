@@ -18,3 +18,5 @@ jobs:
       run: make test_function && ./tests/test_function
     - name: test recursive function
       run: make test_recursive_function && ./tests/test_recursive_function
+    - name: test type error
+      run: make test_type_err && ./tests/test_type_err

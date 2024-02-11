@@ -1,7 +1,7 @@
 SRC= syntax.ml myparser.mly mylexer.mll eval.ml main.ml 
 COMPONENT= syntax.ml myparser.mli myparser.ml mylexer.ml eval.ml main.ml 
 TARGET= miniocaml
-TESTS= test_expression test_environment test_parse_and_run test_function test_recursive_function test_type_err
+TESTS= test_expression test_environment test_parse_and_run test_function test_recursive_function test_type_err test_list
 
 .DEFAULT_GOAL := $(TARGET)
 .PHONY: clean $(TESTS)
@@ -52,6 +52,9 @@ test_recursive_function: syntax.ml myparser.mli myparser.ml mylexer.ml eval.ml .
 	ocamlc -o tests/$@ $^
 
 test_type_err: syntax.ml myparser.mli myparser.ml mylexer.ml eval.ml ./tests/test_type_err.ml
+	ocamlc -o tests/$@ $^
+
+test_list: syntax.ml myparser.mli myparser.ml mylexer.ml eval.ml ./tests/test_list.ml
 	ocamlc -o tests/$@ $^
 
 test: $(TESTS)

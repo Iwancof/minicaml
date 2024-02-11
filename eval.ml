@@ -103,7 +103,6 @@ let rec eval e env =
       | v -> IfTypeErr(v))
   | Var(s) -> (lookup (s) env)
   | Let(s, e1, e2) -> (eval e2 (break_ext env s (eval e1 env)))
-  (*
   | Cons(e1, e2) -> 
     (match (eval_env e2) with
     | ListVal(l) -> ListVal((eval_env e1) :: l)
@@ -117,7 +116,6 @@ let rec eval e env =
     | ListVal(h :: t) -> ListVal(t)
     | _ -> failwith "Type error(Tail)")
   | Empty -> (ListVal([]))
-  *)
   | Fun(s, e1) -> FunVal(s, e1, snapshot env)
   | LetRec(func_name, arg, body, expr) -> (eval expr (break_ext env func_name (RecFunVal(func_name, arg, body, snapshot env)))) (* evaludating expr needs recursive function *)
   | App(f, arg) -> 

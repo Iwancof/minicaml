@@ -37,4 +37,8 @@ let e =
 
 print_string (test_int (eval e (emptyenv ())) 4);;
 
+let e = Var("x");;
+
+print_string (test_bool (eval e (emptyenv ()) = UnboundErr("x")));;
+
 exit(0);;

@@ -7,7 +7,7 @@ let snapshot env = Hashtbl.copy env
 
 let lookup x env =
   try Hashtbl.find env x
-  with Not_found -> raise (Failure ("unbound variable: " ^ x));;
+  with Not_found -> UnboundErr(x)
 
 let rec exp_to_string e = 
   match e with
@@ -153,4 +153,5 @@ let rec value_to_string v =
   | IfTypeErr(v) -> "Type error{If(" ^ (value_to_string v) ^ ")}"
   | EmptyListErr -> "Empty list{[]}"
   | NotAFunctionErr(func_body, arg) -> "Not a function{" ^ (value_to_string func_body) ^ "(" ^ (value_to_string arg) ^ ")}"
+  | UnboundErr(s) -> "Unbound variable{" ^ s ^ "}"
   | Unimplemented(msg) -> msg

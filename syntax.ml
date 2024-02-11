@@ -61,6 +61,7 @@ type value =
   | IfTypeErr of value
   | EmptyListErr
   | NotAFunctionErr of value * value
+  | UnboundErr of string
   | Unimplemented of string
 and env = (string, value) Hashtbl.t
 

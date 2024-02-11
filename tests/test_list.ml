@@ -42,4 +42,11 @@ print_string (test_bool (run "List.tl 1" = UnOpTypeErr("List.tl", IntVal 1)));;
 
 print_string (test_bool (run "1 :: 2" = BinOpTypeErr("::", IntVal 1, IntVal 2)));;
 
+print_string (test_bool (run "[] = []" = BoolVal true));;
+print_string (test_bool (run "[1; 2] = [1; 2]" = BoolVal true));;
+print_string (test_bool (run "[1; 2] = [1; 3]" = BoolVal false));;
+print_string (test_bool (run "[1; 2] = []" = BoolVal false));;
+print_string (test_bool (run "[1] = [[1]]" = BoolVal false));;
+print_string (test_bool (run "1 = []" = BinOpTypeErr("=", IntVal 1, ListVal [])));;
+
 exit(0);;

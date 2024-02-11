@@ -86,6 +86,7 @@ let rec eval e env =
     (match (eval_env e2, eval_env e1) with
     | (IntVal(i2), IntVal(i1)) -> BoolVal(i1 = i2)
     | (BoolVal(b2), BoolVal(b1)) -> BoolVal(b1 = b2)
+    | (ListVal(l2), ListVal(l1)) -> BoolVal(l1 = l2)
     | (a, b) -> BinOpTypeErr("=", b, a))
   | Neq(e1, e2) ->
     (match (eval_env e2, eval_env e1) with

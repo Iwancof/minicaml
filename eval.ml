@@ -106,15 +106,17 @@ let rec eval e env =
   | Cons(e1, e2) -> 
     (match (eval_env e2) with
     | ListVal(l) -> ListVal((eval_env e1) :: l)
-    | _ -> failwith "Type error(Cons)")
+    | v -> BinOpTypeErr("::", eval_env e1, v))
   | Head(e1) -> 
     (match (eval_env e1) with
     | ListVal(h :: t) -> h
-    | _ -> failwith "Type error(Head)")
+    | ListVal([]) -> EmptyListErr
+    | v -> UnOpTypeErr("List.hd", v))
   | Tail(e1) ->
     (match (eval_env e1) with
     | ListVal(h :: t) -> ListVal(t)
-    | _ -> failwith "Type error(Tail)")
+    | ListVal([]) -> EmptyListErr
+    | v -> UnOpTypeErr("List.tl", v))
   | Empty -> (ListVal([]))
   | Fun(s, e1) -> FunVal(s, e1, snapshot env)
   | LetRec(func_name, arg, body, expr) -> (eval expr (break_ext env func_name (RecFunVal(func_name, arg, body, snapshot env)))) (* evaludating expr needs recursive function *)
@@ -149,5 +151,6 @@ let rec value_to_string v =
   | BinOpTypeErr(op, v1, v2) -> "Type error{" ^ (value_to_string v1) ^ " " ^ op ^ " " ^ (value_to_string v2) ^ "}"
   | UnOpTypeErr(msg, v) -> "Type error{" ^ msg ^ " " ^ (value_to_string v) ^ "}"
   | IfTypeErr(v) -> "Type error{If(" ^ (value_to_string v) ^ ")}"
+  | EmptyListErr -> "Empty list{[]}"
   | NotAFunctionErr(func_body, arg) -> "Not a function{" ^ (value_to_string func_body) ^ "(" ^ (value_to_string arg) ^ ")}"
   | Unimplemented(msg) -> msg

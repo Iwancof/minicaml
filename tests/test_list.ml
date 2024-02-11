@@ -34,4 +34,12 @@ let get_two_elms =
   in
   get_two_elms [1; 2; 3; 4]" = ListVal [IntVal 1; IntVal 2]));;
 
+print_string (test_bool (run "List.hd []" = EmptyListErr));
+print_string (test_bool (run "List.tl []" = EmptyListErr));;
+
+print_string (test_bool (run "List.hd 1" = UnOpTypeErr("List.hd", IntVal 1)));;
+print_string (test_bool (run "List.tl 1" = UnOpTypeErr("List.tl", IntVal 1)));;
+
+print_string (test_bool (run "1 :: 2" = BinOpTypeErr("::", IntVal 1, IntVal 2)));;
+
 exit(0);;

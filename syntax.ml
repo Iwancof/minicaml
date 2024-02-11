@@ -59,6 +59,7 @@ type value =
   | BinOpTypeErr of (string * value * value)
   | UnOpTypeErr of (string * value)
   | IfTypeErr of value
+  | EmptyListErr
   | NotAFunctionErr of value * value
   | Unimplemented of string
 and env = (string, value) Hashtbl.t

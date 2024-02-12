@@ -19,8 +19,8 @@ print_string (test_bool (run "(1 + 1) + true" = TypeErr( BinOpTypeErr(OPlus, Int
 
 print_string (test_bool (run "1 = true" = TypeErr( BinOpTypeErr(OEq, IntVal(1), BoolVal(true)))) );
 
-print_string (test_bool (run "1 < true" = TypeErr( BinOpTypeErr(OGreater, IntVal(1), BoolVal(true)))) );
-print_string (test_bool (run "1 > true" = TypeErr( BinOpTypeErr(OLess, IntVal(1), BoolVal(true)))) );
+print_string (test_bool (run "1 < true" = TypeErr( BinOpTypeErr(OLess, IntVal(1), BoolVal(true)))) );
+print_string (test_bool (run "1 > true" = TypeErr( BinOpTypeErr(OGreater, IntVal(1), BoolVal(true)))) );
 
 (*
 print_string (test_bool (run "1 <= true" = BinOpTypeErr("<=", IntVal(1), BoolVal(true))));

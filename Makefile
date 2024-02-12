@@ -58,7 +58,4 @@ test_list: syntax.ml myparser.mli myparser.ml mylexer.ml eval.ml ./tests/test_li
 	ocamlc -o tests/$@ $^
 
 test: $(TESTS)
-	@for test in $(TESTS); do \
-		echo "Running test $$test"; \
-		./tests/$$test; \
-	done
+	$(foreach test, $(TESTS), echo "running $(test)" && tests/$(test) &&) echo "OK";

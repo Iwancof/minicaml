@@ -1,4 +1,5 @@
 open Eval;;
+open Syntax;;
 open Main;;
 
 print_string ("demo-1: 1 + 2" ^ "\n");

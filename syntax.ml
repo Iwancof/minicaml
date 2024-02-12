@@ -61,7 +61,8 @@ and mintype =
   | IntTy
   | BoolTy
   | ListTy of mintype
-  | FunTy of mintype * mintype
+  | EmptyListTy
+  | FunTy of mintype * mintype * env
   | BinOpTypeErr of (error_bin_op * mintype * mintype)
   | UnOpTypeErr of (error_un_op * mintype)
   | IfCondTypeErr of mintype
@@ -166,7 +167,8 @@ and mintype_to_string ty =
   | IntTy -> "int"
   | BoolTy -> "bool"
   | ListTy(ity) -> mintype_to_string ity ^ " list"
-  | FunTy(arg, ret) -> "fun " ^ mintype_to_string arg ^ " -> " ^ mintype_to_string ret
+  | EmptyListTy -> "(not determined) list"
+  | FunTy(arg, ret, _env) -> "fun " ^ mintype_to_string arg ^ " -> " ^ mintype_to_string ret
   | BinOpTypeErr(op, left, right) -> "Type error{" ^ (mintype_to_string left) ^ " " ^ (error_bin_op_to_string op) ^ " " ^ (mintype_to_string right) ^ "}"
   | UnOpTypeErr(op, v) -> "Type error{" ^ (error_un_op_to_string op) ^ " " ^ (mintype_to_string v) ^ "}"
   | IfCondTypeErr(v) -> "Type error{If(" ^ (mintype_to_string v) ^ ")}"
@@ -174,6 +176,7 @@ and mintype_to_string ty =
   | NotAFunctionErr(func_body, arg) -> "Not a function{" ^ (mintype_to_string func_body) ^ "(" ^ (mintype_to_string arg) ^ ")}"
   | UnboundErr(s) -> "Unbound variable{" ^ s ^ "}"
   | RuntimeError(msg) -> "Runtime type error{" ^ msg ^ "}"
+(*
 and value_to_type value =
   match value with
   | IntVal(v) -> IntTy
@@ -189,3 +192,4 @@ and value_to_type value =
   | EmptyListErr -> RuntimeError("EmptyList")
   | DivByZeroErr(v) -> RuntimeError("DivByZeroErr")
   | Unimplemented(msg) -> RuntimeError("Unimplemented: " ^ msg)
+*)

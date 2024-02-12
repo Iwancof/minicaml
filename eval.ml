@@ -5,13 +5,19 @@ let emptyenv () = Hashtbl.create 10;;
 let break_ext env x v = Hashtbl.add env x v; env
 let snapshot env = Hashtbl.copy env
 
-(* this funcion needs type notation *)
 let lookup x env: value =
   try Hashtbl.find env x
   with Not_found -> UnboundErr(x)
 
-(* 
-let lookup_type x env: mintype = value_to_type (lookup x env)
+let emptyenv_type () = Hashtbl.create 10;;
+
+let break_ext_type env x v = Hashtbl.add env x v; env
+let snapshot_type env = Hashtbl.copy env
+
+let lookup_type x env: mintype =
+  try Hashtbl.find env x
+  with Not_found -> UnboundErr(x)
+
 
 let rec exp_to_type e env =
   let typeof e = exp_to_type e env in
@@ -43,6 +49,28 @@ let rec exp_to_type e env =
   | Not(v) -> (match (typeof v) with
     | BoolTy -> BoolTy
     | v -> UnOpTypeErr(ONot, v))
+  | Eq(left, right) -> (match (typeof left, typeof right) with
+    | (IntTy, IntTy) -> BoolTy
+    | (BoolTy, BoolTy) -> BoolTy
+    | (ListTy(l), ListTy(r)) -> (
+      if l = r then
+        BoolTy
+      else
+        BinOpTypeErr(OEq, l, r) (* Error occured in list *)
+    )
+    | (EmptyListTy, EmptyListTy) -> BoolTy
+    | (l, r) -> BinOpTypeErr(OEq, l, r))
+  | Neq(left, right) -> (match (typeof left, typeof right) with
+    | (IntTy, IntTy) -> BoolTy
+    | (BoolTy, BoolTy) -> BoolTy
+    | (ListTy(l), ListTy(r)) -> (
+      if l = r then
+        BoolTy
+      else
+        BinOpTypeErr(ONeq, l, r) (* Error occured in list *)
+    )
+    | (EmptyListTy, EmptyListTy) -> BoolTy
+    | (l, r) -> BinOpTypeErr(ONeq, l, r))
   | Less(left, right) -> (match (typeof left, typeof right) with
     | (IntTy, IntTy) -> BoolTy
     | (l, r) -> BinOpTypeErr(OLess, l, r))
@@ -67,10 +95,40 @@ let rec exp_to_type e env =
           )
       | other -> IfCondTypeErr(other))
   | Var(s) -> (lookup_type s env)
-  | Let(s, e1, e2)
-
-*)
-
+  | Let(s, e1, e2) -> (exp_to_type e2 (break_ext_type env s (typeof e1)))
+  | Cons(e1, e2) ->
+      (
+        let list_type = typeof e2 in
+        let elm_type = typeof e1 in
+        match list_type with
+        | ListTy(inner_type) -> (
+          if elm_type = inner_type then
+            ListTy(inner_type)
+          else
+            BinOpTypeErr(OCons, elm_type, list_type)
+          )
+        | EmptyListTy ->  ListTy(elm_type)
+        | other -> BinOpTypeErr(OCons, elm_type, other)
+      )
+  | Head(l) ->
+      (
+        match (typeof l) with
+        | ListTy(t) -> t
+        | EmptyListTy -> RuntimeError("List is empty")
+        | other -> UnOpTypeErr(OHead, other)
+      )
+  | Tail(l) ->
+      (
+        match (typeof l) with
+        | ListTy(t) -> ListTy(t)
+        | EmptyListTy -> RuntimeError("List is empty")
+        | other -> UnOpTypeErr(OTail, other)
+      )
+  | Empty -> EmptyListTy
+  | Fun(arg, exp) -> failwith "Unimplemented"
+  | LetRec(fname, arg, body, exp) -> failwith "Unimplemented"
+  | App(f, arg) -> failwith "Unimplemented"
+  | _ -> failwith "Unimplemented"
 
 let rec eval e env = 
   let eval_env e = eval e env in
@@ -120,6 +178,7 @@ let rec eval e env =
     (match (eval_env e2, eval_env e1) with
     | (IntVal(i2), IntVal(i1)) -> BoolVal(i1 <> i2)
     | (BoolVal(b2), BoolVal(b1)) -> BoolVal(b1 <> b2)
+    | (ListVal(l2), ListVal(l1)) -> BoolVal(l1 <> l2)
     | (a, b) -> (BinOpTypeErr(ONeq, b, a)))
   | Less(e1, e2) -> int_comp ( < ) e1 e2 OLess
   | Greater(e1, e2) -> int_comp ( > ) e1 e2 OGreater

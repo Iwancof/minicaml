@@ -56,14 +56,11 @@ type value =
   | FunVal of string * exp * env
   | RecFunVal of string * string * exp * env
   | DivByZeroErr of value (* value / 0 occurs *)
-  (*
-  | BinOpTypeErr of (string * value * value)
-  | UnOpTypeErr of (string * value)
+  | BinOpTypeErr of (error_bin_op * value * value)
+  | UnOpTypeErr of (error_un_op * value)
   | IfTypeErr of value
   | NotAFunctionErr of value * value
   | UnboundErr of string
-  *)
-  | TypeErr of type_err
   | EmptyListErr
   | Unimplemented of string
 and env = (string, value) Hashtbl.t
@@ -86,29 +83,16 @@ and error_un_op =
   | ONot
   | OHead
   | OTail
-and type_err = 
-  | BinOpTypeErr of (error_bin_op * value * value)
-  | UnOpTypeErr of (error_un_op * value)
-  | IfTypeErr of value
-  | NotAFunctionErr of value * value
-  | UnboundErr of string
 and ty = 
   | IntTy
   | BoolTy
   | ListTy of ty
   | FunTy of ty * ty
-  | Error of type_err
+  (* TODO *)
 
 (* to_string helpers *)
 
-let rec error_to_string err =
-  match err with
-    | BinOpTypeErr(op, v1, v2) -> "Type error{" ^ (value_to_string v1) ^ " " ^ (error_bin_op_to_string op) ^ " " ^ (value_to_string v2) ^ "}"
-    | UnOpTypeErr(op, v) -> "Type error{" ^ (error_un_op_to_string op) ^ " " ^ (value_to_string v) ^ "}"
-    | IfTypeErr(v) -> "Type error{If(" ^ (value_to_string v) ^ ")}"
-    | NotAFunctionErr(func_body, arg) -> "Not a function{" ^ (value_to_string func_body) ^ "(" ^ (value_to_string arg) ^ ")}"
-    | UnboundErr(s) -> "Unbound variable{" ^ s ^ "}"
-and error_bin_op_to_string op =
+let rec error_bin_op_to_string op =
   match op with
   | OPlus -> "+"
   | OMinus -> "-"
@@ -137,7 +121,11 @@ and value_to_string v =
   | FunVal(arg_name, exp, _env) -> "<fun>(" ^ arg_name ^ ") -> " ^ (exp_to_string exp)
   | RecFunVal(func_name, arg_name, exp, _env) -> func_name ^ "(" ^ arg_name ^ ") -> " ^ (exp_to_string exp)
   | DivByZeroErr(v) -> "Divide by zero{" ^ (value_to_string v) ^ " / 0}"
-  | TypeErr(err) -> error_to_string err
+  | BinOpTypeErr(op, v1, v2) -> "Type error{" ^ (value_to_string v1) ^ " " ^ (error_bin_op_to_string op) ^ " " ^ (value_to_string v2) ^ "}"
+  | UnOpTypeErr(op, v) -> "Type error{" ^ (error_un_op_to_string op) ^ " " ^ (value_to_string v) ^ "}"
+  | IfTypeErr(v) -> "Type error{If(" ^ (value_to_string v) ^ ")}"
+  | NotAFunctionErr(func_body, arg) -> "Not a function{" ^ (value_to_string func_body) ^ "(" ^ (value_to_string arg) ^ ")}"
+  | UnboundErr(s) -> "Unbound variable{" ^ s ^ "}"
   | EmptyListErr -> "Empty list{[]}"
   | Unimplemented(msg) -> msg
 and type_to_string t =
@@ -146,7 +134,6 @@ and type_to_string t =
   | BoolTy -> "bool"
   | ListTy(t) -> (type_to_string t) ^ " list"
   | FunTy(t1, t2) -> (type_to_string t1) ^ " -> " ^ (type_to_string t2)
-  | Error(err) -> error_to_string err
 and exp_to_string e = 
   match e with
   | IntLit(i) -> string_of_int i

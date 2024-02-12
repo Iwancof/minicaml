@@ -25,7 +25,7 @@ print_string (test_bool (run "1 > true" = ( BinOpTypeErr(OGreater, IntVal(1), Bo
 print_string (test_bool (run "1 <= true" = BinOpTypeErr(OLessEq, IntVal(1), BoolVal(true))));
 print_string (test_bool (run "1 >= true" = BinOpTypeErr(OGreaterEq, IntVal(1), BoolVal(true))));
 
-print_string (test_bool (run "if 1 then 2 else 3" = ( IfTypeErr(IntVal(1)))) );
+print_string (test_bool (run "if 1 then 2 else 3" = ( IfCondTypeErr(IntVal(1)))) );
 
 print_string (test_bool (run "1(2)" = ( NotAFunctionErr(IntVal(1), IntVal(2)))) );
 

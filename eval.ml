@@ -5,26 +5,72 @@ let emptyenv () = Hashtbl.create 10;;
 let break_ext env x v = Hashtbl.add env x v; env
 let snapshot env = Hashtbl.copy env
 
-let lookup x env =
+(* this funcion needs type notation *)
+let lookup x env: value =
   try Hashtbl.find env x
-  with Not_found -> (UnboundErr(x))
+  with Not_found -> UnboundErr(x)
 
-(*
-let rec type_of =
+(* 
+let lookup_type x env: mintype = value_to_type (lookup x env)
+
+let rec exp_to_type e env =
+  let typeof e = exp_to_type e env in
   match e with
   | IntLit(_) -> IntTy
   | BoolLit(_) -> BoolTy
 
-  | Plus(e1, e2) -> (match (type_of e1, type_of e2) with
+  | Plus(left, right) -> (match (typeof left, typeof right) with
     | (IntTy, IntTy) -> IntTy
+    | (l, r) -> BinOpTypeErr(OPlus, l, r))
+  | Minus(left, right) -> (match (typeof left, typeof right) with
+    | (IntTy, IntTy) -> IntTy
+    | (l, r) -> BinOpTypeErr(OMinus, l, r))
+  | Times(left, right) -> (match (typeof left, typeof right) with
+    | (IntTy, IntTy) -> IntTy
+    | (l, r) -> BinOpTypeErr(OTimes, l, r))
+  | Div(left, right) -> (match (typeof left, typeof right) with
+    | (IntTy, IntTy) -> IntTy
+    | (l, r) -> BinOpTypeErr(ODiv, l, r))
+  | Neg(v) -> (match (typeof v) with
+    | IntTy -> IntTy
+    | v -> UnOpTypeErr(ONeg, v))
+  | And(left, right) -> (match (typeof left, typeof right) with
+    | (BoolTy, BoolTy) -> BoolTy
+    | (l, r) -> BinOpTypeErr(OAnd, l, r))
+  | Or(left, right) -> (match (typeof left, typeof right) with
+    | (BoolTy, BoolTy) -> BoolTy
+    | (l, r) -> BinOpTypeErr(OOr, l, r))
+  | Not(v) -> (match (typeof v) with
+    | BoolTy -> BoolTy
+    | v -> UnOpTypeErr(ONot, v))
+  | Less(left, right) -> (match (typeof left, typeof right) with
+    | (IntTy, IntTy) -> BoolTy
+    | (l, r) -> BinOpTypeErr(OLess, l, r))
+  | Greater(left, right) -> (match (typeof left, typeof right) with
+    | (IntTy, IntTy) -> BoolTy
+    | (l, r) -> BinOpTypeErr(OGreater, l, r))
+  | LessEq(left, right) -> (match (typeof left, typeof right) with
+    | (IntTy, IntTy) -> BoolTy
+    | (l, r) -> BinOpTypeErr(OLessEq, l, r))
+  | GreaterEq(left, right) -> (match (typeof left, typeof right) with
+    | (IntTy, IntTy) -> BoolTy
+    | (l, r) -> BinOpTypeErr(OGreaterEq, l, r))
+  | If(cond, t, f) -> (match (typeof cond) with
+      | BoolTy -> 
+          (
+          let tt = typeof t in
+          let ft = typeof f in
+          if tt = ft then
+            tt
+          else
+            IfArmTypeErr(tt, ft)
+          )
+      | other -> IfCondTypeErr(other))
+  | Var(s) -> (lookup_type s env)
+  | Let(s, e1, e2)
 
-  (*
-  | Plus(e1, e2) | Minus(e1, e2) | Times(e1, e2) | Div(e1, e2) -> 
-      (match (type_of e1, type_of e2) with
-      | (IntTy, IntTy) -> IntTy
-      | (t1, t2) -> Error(BinOp(
-      *)
 *)
+
 
 let rec eval e env = 
   let eval_env e = eval e env in
@@ -83,7 +129,7 @@ let rec eval e env =
       (match (eval_env e1) with
       | BoolVal(true) -> eval_env e2
       | BoolVal(false) -> eval_env e3
-      | v -> (IfTypeErr(v)))
+      | v -> (IfCondTypeErr(v)))
   | Var(s) -> (lookup (s) env)
   | Let(s, e1, e2) -> (eval e2 (break_ext env s (eval e1 env)))
   | Cons(e1, e2) -> 

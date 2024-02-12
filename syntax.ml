@@ -42,13 +42,6 @@ type exp =
   | Tail of exp
   | Empty
 
-(* TODO
-type error_by = 
-  | Plus
-  | Minus
-  ...
-*)
-
 type value = 
   | IntVal of int
   | BoolVal of bool
@@ -58,12 +51,24 @@ type value =
   | DivByZeroErr of value (* value / 0 occurs *)
   | BinOpTypeErr of (error_bin_op * value * value)
   | UnOpTypeErr of (error_un_op * value)
-  | IfTypeErr of value
+  | IfCondTypeErr of value
   | NotAFunctionErr of value * value
   | UnboundErr of string
   | EmptyListErr
   | Unimplemented of string
 and env = (string, value) Hashtbl.t
+and mintype = 
+  | IntTy
+  | BoolTy
+  | ListTy of mintype
+  | FunTy of mintype * mintype
+  | BinOpTypeErr of (error_bin_op * mintype * mintype)
+  | UnOpTypeErr of (error_un_op * mintype)
+  | IfCondTypeErr of mintype
+  | IfArmTypeErr of mintype * mintype
+  | NotAFunctionErr of mintype * mintype
+  | UnboundErr of string
+  | RuntimeError of string
 and error_bin_op =
   | OPlus
   | OMinus
@@ -83,12 +88,6 @@ and error_un_op =
   | ONot
   | OHead
   | OTail
-and ty = 
-  | IntTy
-  | BoolTy
-  | ListTy of ty
-  | FunTy of ty * ty
-  (* TODO *)
 
 (* to_string helpers *)
 
@@ -123,17 +122,11 @@ and value_to_string v =
   | DivByZeroErr(v) -> "Divide by zero{" ^ (value_to_string v) ^ " / 0}"
   | BinOpTypeErr(op, v1, v2) -> "Type error{" ^ (value_to_string v1) ^ " " ^ (error_bin_op_to_string op) ^ " " ^ (value_to_string v2) ^ "}"
   | UnOpTypeErr(op, v) -> "Type error{" ^ (error_un_op_to_string op) ^ " " ^ (value_to_string v) ^ "}"
-  | IfTypeErr(v) -> "Type error{If(" ^ (value_to_string v) ^ ")}"
+  | IfCondTypeErr(v) -> "Type error{If(" ^ (value_to_string v) ^ ")}"
   | NotAFunctionErr(func_body, arg) -> "Not a function{" ^ (value_to_string func_body) ^ "(" ^ (value_to_string arg) ^ ")}"
   | UnboundErr(s) -> "Unbound variable{" ^ s ^ "}"
   | EmptyListErr -> "Empty list{[]}"
   | Unimplemented(msg) -> msg
-and type_to_string t =
-  match t with
-  | IntTy -> "int"
-  | BoolTy -> "bool"
-  | ListTy(t) -> (type_to_string t) ^ " list"
-  | FunTy(t1, t2) -> (type_to_string t1) ^ " -> " ^ (type_to_string t2)
 and exp_to_string e = 
   match e with
   | IntLit(i) -> string_of_int i
@@ -168,3 +161,31 @@ and exp_to_string e =
   | Head(e1) -> "List.hd " ^ (exp_to_string e1)
   | Tail(e1) -> "List.tl " ^ (exp_to_string e1)
   | Empty -> "[]"
+and mintype_to_string ty = 
+  match ty with
+  | IntTy -> "int"
+  | BoolTy -> "bool"
+  | ListTy(ity) -> mintype_to_string ity ^ " list"
+  | FunTy(arg, ret) -> "fun " ^ mintype_to_string arg ^ " -> " ^ mintype_to_string ret
+  | BinOpTypeErr(op, left, right) -> "Type error{" ^ (mintype_to_string left) ^ " " ^ (error_bin_op_to_string op) ^ " " ^ (mintype_to_string right) ^ "}"
+  | UnOpTypeErr(op, v) -> "Type error{" ^ (error_un_op_to_string op) ^ " " ^ (mintype_to_string v) ^ "}"
+  | IfCondTypeErr(v) -> "Type error{If(" ^ (mintype_to_string v) ^ ")}"
+  | IfArmTypeErr(t, f) -> "Type error{If cond then (" ^ (mintype_to_string t) ^ ") else (" ^ (mintype_to_string f) ^ ")"
+  | NotAFunctionErr(func_body, arg) -> "Not a function{" ^ (mintype_to_string func_body) ^ "(" ^ (mintype_to_string arg) ^ ")}"
+  | UnboundErr(s) -> "Unbound variable{" ^ s ^ "}"
+  | RuntimeError(msg) -> "Runtime type error{" ^ msg ^ "}"
+and value_to_type value =
+  match value with
+  | IntVal(v) -> IntTy
+  | BoolVal(b) -> BoolTy
+  | ListVal(l) -> failwith "Unimplemented"
+  | FunVal(_arg, _exp, _env) -> failwith "unimplemented"
+  | RecFunVal(_name, _arg, exp, _env) -> failwith "unimplemented"
+  | BinOpTypeErr(op, left, right) -> BinOpTypeErr(op, value_to_type left, value_to_type right)
+  | UnOpTypeErr(op, v) -> UnOpTypeErr(op, value_to_type v)
+  | IfCondTypeErr(v) -> IfCondTypeErr(value_to_type v)
+  | NotAFunctionErr(func, arg) -> NotAFunctionErr(value_to_type func, value_to_type arg)
+  | UnboundErr(x) -> UnboundErr(x)
+  | EmptyListErr -> RuntimeError("EmptyList")
+  | DivByZeroErr(v) -> RuntimeError("DivByZeroErr")
+  | Unimplemented(msg) -> RuntimeError("Unimplemented: " ^ msg)

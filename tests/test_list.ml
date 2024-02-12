@@ -48,5 +48,7 @@ print_string (test_bool (run "[1; 2] = [1; 3]" = BoolVal false));;
 print_string (test_bool (run "[1; 2] = []" = BoolVal false));;
 print_string (test_bool (run "[1] = [[1]]" = BoolVal false));;
 print_string (test_bool (run "1 = []" = ( BinOpTypeErr(OEq, IntVal 1, ListVal []))));;
+print_string (test_bool (run "[] <> []" = BoolVal false));;
+print_string (test_bool (run "[1] <> [2]" = BoolVal true));;
 
 exit(0);;

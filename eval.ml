@@ -18,7 +18,6 @@ let lookup_type x env: mintype =
   try Hashtbl.find env x
   with Not_found -> UnboundErr(x)
 
-
 let rec exp_to_type e env =
   let typeof e = exp_to_type e env in
   match e with

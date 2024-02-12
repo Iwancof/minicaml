@@ -22,3 +22,5 @@ jobs:
       run: make test_type_err && ./tests/test_type_err
     - name: test list
       run: make test_list && ./tests/test_list
+    - name: test type checker
+      run: make test_type_checker && ./tests/test_type_checker

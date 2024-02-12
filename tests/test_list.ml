@@ -37,16 +37,16 @@ let get_two_elms =
 print_string (test_bool (run "List.hd []" = EmptyListErr));
 print_string (test_bool (run "List.tl []" = EmptyListErr));;
 
-print_string (test_bool (run "List.hd 1" = UnOpTypeErr("List.hd", IntVal 1)));;
-print_string (test_bool (run "List.tl 1" = UnOpTypeErr("List.tl", IntVal 1)));;
+print_string (test_bool (run "List.hd 1" = TypeErr( UnOpTypeErr(OHead, IntVal 1))));;
+print_string (test_bool (run "List.tl 1" = TypeErr( UnOpTypeErr(OTail, IntVal 1))));;
 
-print_string (test_bool (run "1 :: 2" = BinOpTypeErr("::", IntVal 1, IntVal 2)));;
+print_string (test_bool (run "1 :: 2" = TypeErr( BinOpTypeErr(OCons, IntVal 1, IntVal 2))));;
 
 print_string (test_bool (run "[] = []" = BoolVal true));;
 print_string (test_bool (run "[1; 2] = [1; 2]" = BoolVal true));;
 print_string (test_bool (run "[1; 2] = [1; 3]" = BoolVal false));;
 print_string (test_bool (run "[1; 2] = []" = BoolVal false));;
 print_string (test_bool (run "[1] = [[1]]" = BoolVal false));;
-print_string (test_bool (run "1 = []" = BinOpTypeErr("=", IntVal 1, ListVal [])));;
+print_string (test_bool (run "1 = []" = TypeErr( BinOpTypeErr(OEq, IntVal 1, ListVal []))));;
 
 exit(0);;

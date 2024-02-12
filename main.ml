@@ -13,7 +13,7 @@ let parse str =
 
 let dump str = 
   let e = parse str in
-  Eval.exp_to_string e;;
+  exp_to_string e;;
 
 let run str = 
   let e = parse str in

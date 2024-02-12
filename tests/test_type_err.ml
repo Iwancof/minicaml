@@ -15,17 +15,15 @@ let test_bool b =
 print_string (test_bool (run "1 + true" = ( BinOpTypeErr(OPlus, IntVal(1), BoolVal(true)))));
 print_string (test_bool (run "(1 + 1) + true" = ( BinOpTypeErr(OPlus, IntVal(2), BoolVal(true)))) );
 
-(* print_string (test_bool (run "1 && true" = BinOp("&&", IntVal(1), BoolVal(true)))); *)
+print_string (test_bool (run "1 && true" = BinOpTypeErr(OAnd, IntVal(1), BoolVal(true))));
 
 print_string (test_bool (run "1 = true" = ( BinOpTypeErr(OEq, IntVal(1), BoolVal(true)))) );
 
 print_string (test_bool (run "1 < true" = ( BinOpTypeErr(OLess, IntVal(1), BoolVal(true)))) );
 print_string (test_bool (run "1 > true" = ( BinOpTypeErr(OGreater, IntVal(1), BoolVal(true)))) );
 
-(*
-print_string (test_bool (run "1 <= true" = BinOp("<=", IntVal(1), BoolVal(true))));
-print_string (test_bool (run "1 >= true" = BinOp(">=", IntVal(1), BoolVal(true))));
-*)
+print_string (test_bool (run "1 <= true" = BinOpTypeErr(OLessEq, IntVal(1), BoolVal(true))));
+print_string (test_bool (run "1 >= true" = BinOpTypeErr(OGreaterEq, IntVal(1), BoolVal(true))));
 
 print_string (test_bool (run "if 1 then 2 else 3" = ( IfTypeErr(IntVal(1)))) );
 

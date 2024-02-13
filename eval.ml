@@ -9,11 +9,6 @@ let lookup x env: value =
   try Hashtbl.find env x
   with Not_found -> UnboundErr(x)
 
-let emptyenv_type () = Hashtbl.create 10;;
-
-let break_ext_type env x v = Hashtbl.add env x v; env
-let snapshot_type env = Hashtbl.copy env
-
 let lookup_type x env: mintype =
   try Hashtbl.find env x
   with Not_found -> UnboundErr(x)
@@ -94,7 +89,7 @@ let rec exp_to_type e env =
           )
       | other -> IfCondTypeErr(other))
   | Var(s) -> (lookup_type s env)
-  | Let(s, e1, e2) -> (exp_to_type e2 (break_ext_type env s (typeof e1)))
+  | Let(s, e1, e2) -> (exp_to_type e2 (break_ext env s (typeof e1)))
   | Cons(e1, e2) ->
       (
         let list_type = typeof e2 in

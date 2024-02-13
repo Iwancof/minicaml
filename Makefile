@@ -1,5 +1,6 @@
-SRC= syntax.ml myparser.mly mylexer.mll eval.ml main.ml 
-COMPONENT= syntax.ml myparser.mli myparser.ml mylexer.ml eval.ml main.ml 
+SRC= syntax.ml type.ml myparser.mly mylexer.mll eval.ml main.ml 
+COMPONENT= syntax.ml type.ml myparser.mli myparser.ml mylexer.ml eval.ml main.ml 
+INTERPRETER= syntax.ml type.ml myparser.mli myparser.ml mylexer.ml eval.ml
 TARGET= miniocaml
 TESTS= test_expression test_environment test_parse_and_run test_function test_recursive_function test_type_err test_list test_type_checker
 
@@ -34,31 +35,11 @@ clean:
 		**/*.cmi **/*.cmo **/*.mli \
 		*.cmi *.cmo *.mli \
 		$(foreach test, $(TESTS), tests/$(test))
-		
 
-test_expression: syntax.ml eval.ml ./tests/test_expression.ml
-	ocamlc -o tests/$@ $^
-
-test_environment: syntax.ml eval.ml ./tests/test_environment.ml
-	ocamlc -o tests/$@ $^
-
-test_parse_and_run: syntax.ml myparser.mli myparser.ml mylexer.ml eval.ml ./tests/test_parse_and_run.ml
-	ocamlc -o tests/$@ $^
-
-test_function: syntax.ml myparser.mli myparser.ml mylexer.ml eval.ml ./tests/test_function.ml
-	ocamlc -o tests/$@ $^
-
-test_recursive_function: syntax.ml myparser.mli myparser.ml mylexer.ml eval.ml ./tests/test_recursive_function.ml
-	ocamlc -o tests/$@ $^
-
-test_type_err: syntax.ml myparser.mli myparser.ml mylexer.ml eval.ml ./tests/test_type_err.ml
-	ocamlc -o tests/$@ $^
-
-test_list: syntax.ml myparser.mli myparser.ml mylexer.ml eval.ml ./tests/test_list.ml
-	ocamlc -o tests/$@ $^
-
-test_type_checker: syntax.ml myparser.mli myparser.ml mylexer.ml eval.ml ./tests/test_type_checker.ml
-	ocamlc -o tests/$@ $^
+$(TESTS): %: $(INTERPRETER) tests/%.ml 
+	ocamlc -o tests/$@ $(INTERPRETER) tests/$@.ml
+	@echo "compiled tests/$@"
 
 test: $(TESTS)
 	$(foreach test, $(TESTS), echo "running $(test)" && tests/$(test) &&) echo "OK";
+

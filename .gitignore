@@ -8,6 +8,9 @@
 *.cmxs
 *.cmxa
 
+tests/*
+!tests/*.ml
+
 my*
 
 miniocaml

@@ -1,3 +1,23 @@
+type error_bin_op =
+  | OPlus
+  | OMinus
+  | OTimes
+  | ODiv
+  | OAnd
+  | OOr
+  | OEq
+  | ONeq
+  | OLess
+  | OGreater
+  | OLessEq
+  | OGreaterEq
+  | OCons
+type error_un_op =
+  | ONeg
+  | ONot
+  | OHead
+  | OTail
+
 type exp = 
   (* Literals *)
   | IntLit of int
@@ -57,42 +77,10 @@ type value =
   | EmptyListErr
   | Unimplemented of string
 and env = (string, value) Hashtbl.t
-and mintype = 
-  | IntTy
-  | BoolTy
-  | ListTy of mintype
-  | EmptyListTy
-  | FunTy of mintype * mintype * env
-  | BinOpTypeErr of (error_bin_op * mintype * mintype)
-  | UnOpTypeErr of (error_un_op * mintype)
-  | IfCondTypeErr of mintype
-  | IfArmTypeErr of mintype * mintype
-  | NotAFunctionErr of mintype * mintype
-  | UnboundErr of string
-  | RuntimeError of string
-and error_bin_op =
-  | OPlus
-  | OMinus
-  | OTimes
-  | ODiv
-  | OAnd
-  | OOr
-  | OEq
-  | ONeq
-  | OLess
-  | OGreater
-  | OLessEq
-  | OGreaterEq
-  | OCons
-and error_un_op =
-  | ONeg
-  | ONot
-  | OHead
-  | OTail
 
 (* to_string helpers *)
 
-let rec error_bin_op_to_string op =
+let error_bin_op_to_string op =
   match op with
   | OPlus -> "+"
   | OMinus -> "-"
@@ -107,28 +95,14 @@ let rec error_bin_op_to_string op =
   | OLessEq -> "<="
   | OGreaterEq -> ">="
   | OCons -> "::"
-and error_un_op_to_string op =
+let error_un_op_to_string op =
   match op with
   | ONeg -> "-"
   | ONot -> "!"
   | OHead -> "List.hd"
   | OTail -> "List.tl"
-and value_to_string v = 
-  match v with
-  | IntVal(i) -> string_of_int i
-  | BoolVal(b) -> string_of_bool b
-  | ListVal(l) -> "[" ^ (String.concat "; " (List.map value_to_string l)) ^ "]"
-  | FunVal(arg_name, exp, _env) -> "<fun>(" ^ arg_name ^ ") -> " ^ (exp_to_string exp)
-  | RecFunVal(func_name, arg_name, exp, _env) -> func_name ^ "(" ^ arg_name ^ ") -> " ^ (exp_to_string exp)
-  | DivByZeroErr(v) -> "Divide by zero{" ^ (value_to_string v) ^ " / 0}"
-  | BinOpTypeErr(op, v1, v2) -> "Type error{" ^ (value_to_string v1) ^ " " ^ (error_bin_op_to_string op) ^ " " ^ (value_to_string v2) ^ "}"
-  | UnOpTypeErr(op, v) -> "Type error{" ^ (error_un_op_to_string op) ^ " " ^ (value_to_string v) ^ "}"
-  | IfCondTypeErr(v) -> "Type error{If(" ^ (value_to_string v) ^ ")}"
-  | NotAFunctionErr(func_body, arg) -> "Not a function{" ^ (value_to_string func_body) ^ "(" ^ (value_to_string arg) ^ ")}"
-  | UnboundErr(s) -> "Unbound variable{" ^ s ^ "}"
-  | EmptyListErr -> "Empty list{[]}"
-  | Unimplemented(msg) -> msg
-and exp_to_string e = 
+
+let rec exp_to_string e = 
   match e with
   | IntLit(i) -> string_of_int i
   | BoolLit(b) -> string_of_bool b
@@ -162,21 +136,24 @@ and exp_to_string e =
   | Head(e1) -> "List.hd " ^ (exp_to_string e1)
   | Tail(e1) -> "List.tl " ^ (exp_to_string e1)
   | Empty -> "[]"
-and mintype_to_string ty = 
-  match ty with
-  | IntTy -> "int"
-  | BoolTy -> "bool"
-  | ListTy(ity) -> mintype_to_string ity ^ " list"
-  | EmptyListTy -> "(not determined) list"
-  | FunTy(arg, ret, _env) -> "fun " ^ mintype_to_string arg ^ " -> " ^ mintype_to_string ret
-  | BinOpTypeErr(op, left, right) -> "Type error{" ^ (mintype_to_string left) ^ " " ^ (error_bin_op_to_string op) ^ " " ^ (mintype_to_string right) ^ "}"
-  | UnOpTypeErr(op, v) -> "Type error{" ^ (error_un_op_to_string op) ^ " " ^ (mintype_to_string v) ^ "}"
-  | IfCondTypeErr(v) -> "Type error{If(" ^ (mintype_to_string v) ^ ")}"
-  | IfArmTypeErr(t, f) -> "Type error{If cond then (" ^ (mintype_to_string t) ^ ") else (" ^ (mintype_to_string f) ^ ")"
-  | NotAFunctionErr(func_body, arg) -> "Not a function{" ^ (mintype_to_string func_body) ^ "(" ^ (mintype_to_string arg) ^ ")}"
+
+let rec value_to_string v = 
+  match v with
+  | IntVal(i) -> string_of_int i
+  | BoolVal(b) -> string_of_bool b
+  | ListVal(l) -> "[" ^ (String.concat "; " (List.map value_to_string l)) ^ "]"
+  | FunVal(arg_name, exp, _env) -> "<fun>(" ^ arg_name ^ ") -> " ^ (exp_to_string exp)
+  | RecFunVal(func_name, arg_name, exp, _env) -> func_name ^ "(" ^ arg_name ^ ") -> " ^ (exp_to_string exp)
+  | DivByZeroErr(v) -> "Divide by zero{" ^ (value_to_string v) ^ " / 0}"
+  | BinOpTypeErr(op, v1, v2) -> "Type error{" ^ (value_to_string v1) ^ " " ^ (error_bin_op_to_string op) ^ " " ^ (value_to_string v2) ^ "}"
+  | UnOpTypeErr(op, v) -> "Type error{" ^ (error_un_op_to_string op) ^ " " ^ (value_to_string v) ^ "}"
+  | IfCondTypeErr(v) -> "Type error{If(" ^ (value_to_string v) ^ ")}"
+  | NotAFunctionErr(func_body, arg) -> "Not a function{" ^ (value_to_string func_body) ^ "(" ^ (value_to_string arg) ^ ")}"
   | UnboundErr(s) -> "Unbound variable{" ^ s ^ "}"
-  | RuntimeError(msg) -> "Runtime type error{" ^ msg ^ "}"
-and pretty_print_value v = 
+  | EmptyListErr -> "Empty list{[]}"
+  | Unimplemented(msg) -> msg
+
+let rec pretty_print_value v = 
   let is_success v = 
     match v with
     | IntVal(_) -> true

@@ -1,4 +1,5 @@
 open Syntax;;
+open Type;;
 
 let emptyenv () = Hashtbl.create 10;;
 

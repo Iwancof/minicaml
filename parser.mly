@@ -47,6 +47,7 @@ open Syntax
 %token ELSE       // "else"
 %token MATCH      // "match"
 %token TRY        // "try"
+%token RAISE      // "raise"
 %token WITH       // "with"
 %token HEAD       // "List.hd"
 %token TAIL       // "List.tl"
@@ -65,7 +66,7 @@ open Syntax
 %left ASTERISK SLASH
 %nonassoc UNARY
 // 最後にarg_exprの一番左のトークンを並べる
-%left VAR INT TRUE FALSE LBRA LPAREN
+%left VAR INT TRUE FALSE LBRA LPAREN RAISE
 
 %start main
 %type <Syntax.exp> main
@@ -199,6 +200,12 @@ exp:
   // match e with ...
   | MATCH exp WITH cases_rev
     { Match ($2, List.rev $4) }
+
+  | TRY exp WITH exp
+    { Try ($2, $4) }
+
+  | RAISE exp
+    { Raise($2) }
 
   | error
     { 

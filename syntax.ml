@@ -46,6 +46,8 @@ type exp =
   (* Control flow *)
   | If of exp * exp * exp
   | Match of exp * ((exp * exp) list)
+  | Try of exp * exp
+  | Raise of exp
 
   (* Variables *)
   | Var of string
@@ -76,6 +78,7 @@ type value =
   | UnboundErr of string
   | EmptyListErr
   | Unimplemented of string
+  | RuntimeErr of value
 and env = (string, value) Hashtbl.t
 
 (* to_string helpers *)
@@ -126,6 +129,8 @@ let rec exp_to_string e =
 
   | If(e1, e2, e3) -> "if " ^ (exp_to_string e1) ^ " then " ^ (exp_to_string e2) ^ " else " ^ (exp_to_string e3)
   | Match(e1, l) -> "match " ^ (exp_to_string e1) ^ " with " ^ (String.concat " | " (List.map (fun (e1, e2) -> (exp_to_string e1) ^ " -> " ^ (exp_to_string e2)) l))
+  | Try(e1, e2) -> "try " ^ (exp_to_string e1) ^ " with " ^ (exp_to_string e2)
+  | Raise(e1) -> "raise " ^ (exp_to_string e1)
 
   | Var(s) -> s
   | Let(s, e1, e2) -> "let " ^ s ^ " = " ^ (exp_to_string e1) ^ " in " ^ (exp_to_string e2)
@@ -152,6 +157,7 @@ let rec value_to_string v =
   | UnboundErr(s) -> "Unbound variable{" ^ s ^ "}"
   | EmptyListErr -> "Empty list{[]}"
   | Unimplemented(msg) -> msg
+  | RuntimeErr(v) -> "Runtime error{" ^ (value_to_string v) ^ "}"
 
 let rec pretty_print_value v = 
   let is_success v = 
@@ -197,3 +203,9 @@ let rec pretty_print_value v =
   | UnboundErr(s) -> "Unbound variable{" ^ s ^ "}"
   | EmptyListErr -> "Empty list{[]}"
   | Unimplemented(msg) -> msg
+  | RuntimeErr(v) -> (
+    if is_success v then
+      "Runtime error{" ^ (pretty_print_value v) ^ "}"
+    else
+      "(" ^ (pretty_print_value v) ^ ")"
+  )

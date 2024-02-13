@@ -260,4 +260,19 @@ let rec eval e env =
           eval func_body 
           (break_ext (break_ext (snapshot bind_env) func_name f) x arg) (* evaluating the recursive function needs to bind the function itself *)
       | not_func -> (NotAFunctionErr(not_func, arg)))
+  | Try(t, c) -> (
+      let t = eval_env t in
+      (match t with
+      | DivByZeroErr(_) -> (ignore(break_ext env "reason" (IntVal 1)); eval_env c)
+      | BinOpTypeErr(_, _, _) -> (ignore(break_ext env "reason" (IntVal 2)); eval_env c)
+      | UnOpTypeErr(_, _) -> (ignore(break_ext env "reason" (IntVal 3)); eval_env c)
+      | IfCondTypeErr(_) -> (ignore(break_ext env "reason" (IntVal 4)); eval_env c)
+      | NotAFunctionErr(_, _) -> (ignore(break_ext env "reason" (IntVal 5)); eval_env c)
+      | UnboundErr(_) -> (ignore(break_ext env "reason" (IntVal 6)); eval_env c)
+      | EmptyListErr -> (ignore(break_ext env "reason" (IntVal 7)); eval_env c)
+      | Unimplemented(_) -> (ignore(break_ext env "reason" (IntVal 8)); eval_env c)
+      | RuntimeErr(r) -> (ignore(break_ext env "reason" (IntVal 9)); ignore(break_ext env "error" r); eval_env c)
+      | _ -> t)
+    )
+  | Raise(r) -> RuntimeErr(eval_env r)
   | _ -> failwith "Unimplemented"

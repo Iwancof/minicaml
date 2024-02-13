@@ -22,7 +22,7 @@ let run str =
 
 let get_type str = 
   let e = parse str in
-  typeof (parse str) (emptyenv ());;
+  typeof e (emptyenv ());;
 
 (* 使用例は以下の通り。parse関数は Mainモジュールにはいっているので
    open Main;; parse "...";; とするか Main.parse "...";;

@@ -104,3 +104,12 @@ print_string ((mintype_to_string (get_type ("let f = fun x -> x in if f true the
 
 print_string ("demo: let f = fun x -> x && true in if f 1 then 1 else 2" ^ "\n");
 print_string ((mintype_to_string (get_type ("let f = fun x -> x && true in if f 1 + 2 then 1 else 2")) ^ "\n"));
+
+print_string ("demo: try x with reason" ^ "\n");
+print_string ((pretty_print_value (run "try x with reason")) ^ "\n");
+
+print_string ("demo: try raise 12345 with (reason = 9 && error = 12345)" ^ "\n");
+print_string ((pretty_print_value (run "try raise 12345 with (reason = 9 && error = 12345)")) ^ "\n");
+
+print_string ("demo: try 1 / 0 with reason = 1" ^ "\n");
+print_string ((pretty_print_value (run "try 1 / 0 with reason = 1")) ^ "\n");

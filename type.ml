@@ -170,17 +170,18 @@ let rec typeof e env =
 
   (* ... *)
 
-  | Fun(arg, exp) -> (
-    ignore(break_ext env arg (new_typevar arg));
+  | Fun(arg, exp) -> ( (* nest is not supported *)
+    let append = new_typevar arg in
+    ignore(break_ext env arg append);
     let exp_type = typeof_inner exp in
-    let arg_type = lookup_type arg env in
-    ArrowTy(arg_type, exp_type)
+    let ret = ArrowTy(append, exp_type) in
+    solve_type ret env
   )
   | LetRec(fname, arg, body, follow) -> (
     let arg = let n = new_typevar arg in ignore(break_ext env arg n); n in
     let func_type = ArrowTy(arg, typeof_inner body) in
     let env = break_ext env fname func_type in
-    typeof follow env
+    solve_type (typeof follow env) env
   )
   | App(f, arg) -> (
     let f_type = typeof_inner f in

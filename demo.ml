@@ -113,3 +113,12 @@ print_string ((pretty_print_value (run "try raise 12345 with (reason = 9 && erro
 
 print_string ("demo: try 1 / 0 with reason = 1" ^ "\n");
 print_string ((pretty_print_value (run "try 1 / 0 with reason = 1")) ^ "\n");
+
+print_string ("demo: (1 && 2 * false) 3" ^ "\n");
+print_string ((value_to_string (run "(1 && 2 * false) 3")) ^ "\n");
+
+print_string ("demo: fun x -> if x then 1 else 2" ^ "\n");
+print_string ((mintype_to_string (get_type ("fun x -> if x then 1 else 2"))) ^ "\n");
+
+print_string ("demo: (fun t -> fun f -> fun x -> if x then t else f) 1 2 true" ^ "\n");
+print_string ((pretty_print_value (run "(fun t -> fun f -> fun x -> if x then t else f) 1 2 true")) ^ "\n");

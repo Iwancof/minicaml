@@ -176,20 +176,47 @@ and mintype_to_string ty =
   | NotAFunctionErr(func_body, arg) -> "Not a function{" ^ (mintype_to_string func_body) ^ "(" ^ (mintype_to_string arg) ^ ")}"
   | UnboundErr(s) -> "Unbound variable{" ^ s ^ "}"
   | RuntimeError(msg) -> "Runtime type error{" ^ msg ^ "}"
-(*
-and value_to_type value =
-  match value with
-  | IntVal(v) -> IntTy
-  | BoolVal(b) -> BoolTy
-  | ListVal(l) -> failwith "Unimplemented"
-  | FunVal(_arg, _exp, _env) -> failwith "unimplemented"
-  | RecFunVal(_name, _arg, exp, _env) -> failwith "unimplemented"
-  | BinOpTypeErr(op, left, right) -> BinOpTypeErr(op, value_to_type left, value_to_type right)
-  | UnOpTypeErr(op, v) -> UnOpTypeErr(op, value_to_type v)
-  | IfCondTypeErr(v) -> IfCondTypeErr(value_to_type v)
-  | NotAFunctionErr(func, arg) -> NotAFunctionErr(value_to_type func, value_to_type arg)
-  | UnboundErr(x) -> UnboundErr(x)
-  | EmptyListErr -> RuntimeError("EmptyList")
-  | DivByZeroErr(v) -> RuntimeError("DivByZeroErr")
-  | Unimplemented(msg) -> RuntimeError("Unimplemented: " ^ msg)
-*)
+and pretty_print_value v = 
+  let is_success v = 
+    match v with
+    | IntVal(_) -> true
+    | BoolVal(_) -> true
+    | ListVal(_) -> true
+    | FunVal(_, _, _) -> true
+    | RecFunVal(_, _, _, _) -> true
+    | _ -> false
+  in
+  match v with
+  | IntVal(i) -> string_of_int i
+  | BoolVal(b) -> string_of_bool b
+  | ListVal(l) -> "[" ^ (String.concat "; " (List.map pretty_print_value l)) ^ "]"
+  | FunVal(arg_name, exp, _env) -> "<fun>(" ^ arg_name ^ ") -> " ^ (exp_to_string exp)
+  | RecFunVal(func_name, arg_name, exp, _env) -> func_name ^ "(" ^ arg_name ^ ") -> " ^ (exp_to_string exp)
+  | DivByZeroErr(v) -> "Divide by zero{" ^ (pretty_print_value v) ^ " / 0}"
+  | BinOpTypeErr(op, v1, v2) -> (
+    if is_success v1 && is_success v2 then
+      "Type error{" ^ (pretty_print_value v1) ^ " " ^ (error_bin_op_to_string op) ^ " " ^ (pretty_print_value v2) ^ "}"
+    else
+      "(" ^ (pretty_print_value v1) ^ " " ^ (error_bin_op_to_string op) ^ " " ^ (pretty_print_value v2) ^ ")"
+  )
+  | UnOpTypeErr(op, v) -> (
+    if is_success v then
+      "Type error{" ^ (error_un_op_to_string op) ^ " " ^ (pretty_print_value v) ^ "}"
+    else
+      "(" ^ (error_un_op_to_string op) ^ " " ^ (pretty_print_value v) ^ ")"
+  )
+  | IfCondTypeErr(v) -> (
+    if is_success v then
+      "Type error{If(" ^ (pretty_print_value v) ^ ")}"
+    else
+      "If(" ^ (pretty_print_value v) ^ ")"
+  )
+  | NotAFunctionErr(func_body, arg) -> (
+    if is_success func_body && is_success arg then
+      "Not a function{" ^ (pretty_print_value func_body) ^ "(" ^ (pretty_print_value arg) ^ ")}"
+    else
+      "(" ^ (pretty_print_value func_body) ^ "(" ^ (pretty_print_value arg) ^ ")}"
+  )
+  | UnboundErr(s) -> "Unbound variable{" ^ s ^ "}"
+  | EmptyListErr -> "Empty list{[]}"
+  | Unimplemented(msg) -> msg

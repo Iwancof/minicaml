@@ -1,4 +1,5 @@
 open Eval;;
+open Type;;
 open Syntax;;
 
 let parse str = 
@@ -11,7 +12,7 @@ let run str =
 
 let get_type str = 
   let e = parse str in
-  Eval.typeof e (Eval.emptyenv ());;
+  Type.typeof e (Eval.emptyenv ());;
 
 let type_ok str =
   match get_type str with

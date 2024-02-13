@@ -14,37 +14,37 @@ let lookup_type x env: mintype =
   try Hashtbl.find env x
   with Not_found -> UnboundErr(x)
 
-let rec exp_to_type e env =
-  let typeof e = exp_to_type e env in
+let rec typeof e env =
+  let typeof_inner e = typeof e env in
   match e with
   | IntLit(_) -> IntTy
   | BoolLit(_) -> BoolTy
 
-  | Plus(left, right) -> (match (typeof left, typeof right) with
+  | Plus(left, right) -> (match (typeof_inner left, typeof_inner right) with
     | (IntTy, IntTy) -> IntTy
     | (l, r) -> BinOpTypeErr(OPlus, l, r))
-  | Minus(left, right) -> (match (typeof left, typeof right) with
+  | Minus(left, right) -> (match (typeof_inner left, typeof_inner right) with
     | (IntTy, IntTy) -> IntTy
     | (l, r) -> BinOpTypeErr(OMinus, l, r))
-  | Times(left, right) -> (match (typeof left, typeof right) with
+  | Times(left, right) -> (match (typeof_inner left, typeof_inner right) with
     | (IntTy, IntTy) -> IntTy
     | (l, r) -> BinOpTypeErr(OTimes, l, r))
-  | Div(left, right) -> (match (typeof left, typeof right) with
+  | Div(left, right) -> (match (typeof_inner left, typeof_inner right) with
     | (IntTy, IntTy) -> IntTy
     | (l, r) -> BinOpTypeErr(ODiv, l, r))
-  | Neg(v) -> (match (typeof v) with
+  | Neg(v) -> (match (typeof_inner v) with
     | IntTy -> IntTy
     | v -> UnOpTypeErr(ONeg, v))
-  | And(left, right) -> (match (typeof left, typeof right) with
+  | And(left, right) -> (match (typeof_inner left, typeof_inner right) with
     | (BoolTy, BoolTy) -> BoolTy
     | (l, r) -> BinOpTypeErr(OAnd, l, r))
-  | Or(left, right) -> (match (typeof left, typeof right) with
+  | Or(left, right) -> (match (typeof_inner left, typeof_inner right) with
     | (BoolTy, BoolTy) -> BoolTy
     | (l, r) -> BinOpTypeErr(OOr, l, r))
-  | Not(v) -> (match (typeof v) with
+  | Not(v) -> (match (typeof_inner v) with
     | BoolTy -> BoolTy
     | v -> UnOpTypeErr(ONot, v))
-  | Eq(left, right) -> (match (typeof left, typeof right) with
+  | Eq(left, right) -> (match (typeof_inner left, typeof_inner right) with
     | (IntTy, IntTy) -> BoolTy
     | (BoolTy, BoolTy) -> BoolTy
     | (ListTy(l), ListTy(r)) -> (
@@ -55,7 +55,7 @@ let rec exp_to_type e env =
     )
     | (EmptyListTy, EmptyListTy) -> BoolTy
     | (l, r) -> BinOpTypeErr(OEq, l, r))
-  | Neq(left, right) -> (match (typeof left, typeof right) with
+  | Neq(left, right) -> (match (typeof_inner left, typeof_inner right) with
     | (IntTy, IntTy) -> BoolTy
     | (BoolTy, BoolTy) -> BoolTy
     | (ListTy(l), ListTy(r)) -> (
@@ -66,23 +66,23 @@ let rec exp_to_type e env =
     )
     | (EmptyListTy, EmptyListTy) -> BoolTy
     | (l, r) -> BinOpTypeErr(ONeq, l, r))
-  | Less(left, right) -> (match (typeof left, typeof right) with
+  | Less(left, right) -> (match (typeof_inner left, typeof_inner right) with
     | (IntTy, IntTy) -> BoolTy
     | (l, r) -> BinOpTypeErr(OLess, l, r))
-  | Greater(left, right) -> (match (typeof left, typeof right) with
+  | Greater(left, right) -> (match (typeof_inner left, typeof_inner right) with
     | (IntTy, IntTy) -> BoolTy
     | (l, r) -> BinOpTypeErr(OGreater, l, r))
-  | LessEq(left, right) -> (match (typeof left, typeof right) with
+  | LessEq(left, right) -> (match (typeof_inner left, typeof_inner right) with
     | (IntTy, IntTy) -> BoolTy
     | (l, r) -> BinOpTypeErr(OLessEq, l, r))
-  | GreaterEq(left, right) -> (match (typeof left, typeof right) with
+  | GreaterEq(left, right) -> (match (typeof_inner left, typeof_inner right) with
     | (IntTy, IntTy) -> BoolTy
     | (l, r) -> BinOpTypeErr(OGreaterEq, l, r))
-  | If(cond, t, f) -> (match (typeof cond) with
+  | If(cond, t, f) -> (match (typeof_inner cond) with
       | BoolTy -> 
           (
-          let tt = typeof t in
-          let ft = typeof f in
+          let tt = typeof_inner t in
+          let ft = typeof_inner f in
           if tt = ft then
             tt
           else
@@ -90,11 +90,11 @@ let rec exp_to_type e env =
           )
       | other -> IfCondTypeErr(other))
   | Var(s) -> (lookup_type s env)
-  | Let(s, e1, e2) -> (exp_to_type e2 (break_ext env s (typeof e1)))
+  | Let(s, e1, e2) -> (typeof e2 (break_ext env s (typeof_inner e1)))
   | Cons(e1, e2) ->
       (
-        let list_type = typeof e2 in
-        let elm_type = typeof e1 in
+        let list_type = typeof_inner e2 in
+        let elm_type = typeof_inner e1 in
         match list_type with
         | ListTy(inner_type) -> (
           if elm_type = inner_type then
@@ -107,14 +107,14 @@ let rec exp_to_type e env =
       )
   | Head(l) ->
       (
-        match (typeof l) with
+        match (typeof_inner l) with
         | ListTy(t) -> t
         | EmptyListTy -> RuntimeError("List is empty")
         | other -> UnOpTypeErr(OHead, other)
       )
   | Tail(l) ->
       (
-        match (typeof l) with
+        match (typeof_inner l) with
         | ListTy(t) -> ListTy(t)
         | EmptyListTy -> RuntimeError("List is empty")
         | other -> UnOpTypeErr(OTail, other)

@@ -11,7 +11,7 @@ let run str =
 
 let get_type str = 
   let e = parse str in
-  Eval.exp_to_type e (Eval.emptyenv ());;
+  Eval.typeof e (Eval.emptyenv ());;
 
 let type_ok str =
   match get_type str with

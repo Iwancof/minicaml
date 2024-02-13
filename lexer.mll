@@ -53,6 +53,7 @@ rule token = parse
   | "then"    { THEN }
   | "else"    { ELSE }
   | "match"   { MATCH }
+  | "try"     { TRY }
   | "with"    { WITH }
   | "List.hd" { HEAD }
   | "List.tl" { TAIL }

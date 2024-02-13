@@ -3,6 +3,7 @@
 (* 構文定義ファイル syntax.ml で定義された exp型を使う *)
 open Syntax ;;
 open Eval ;;
+open Type ;;
 
 (* 与えられた文字列の字句解析と構文解析だけを行う関数 *)
 (* parse : string -> exp *)
@@ -18,6 +19,10 @@ let dump str =
 let run str = 
   let e = parse str in
   Eval.eval e (Eval.emptyenv ());;
+
+let get_type str = 
+  let e = parse str in
+  typeof (parse str) (emptyenv ());;
 
 (* 使用例は以下の通り。parse関数は Mainモジュールにはいっているので
    open Main;; parse "...";; とするか Main.parse "...";;

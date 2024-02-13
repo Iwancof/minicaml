@@ -46,6 +46,7 @@ open Syntax
 %token THEN       // "then"
 %token ELSE       // "else"
 %token MATCH      // "match"
+%token TRY        // "try"
 %token WITH       // "with"
 %token HEAD       // "List.hd"
 %token TAIL       // "List.tl"
@@ -198,7 +199,7 @@ exp:
   // match e with ...
   | MATCH exp WITH cases_rev
     { Match ($2, List.rev $4) }
-  
+
   | error
     { 
       let message =

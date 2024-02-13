@@ -1,5 +1,6 @@
 open Eval;;
 open Syntax;;
+open Type;;
 open Main;;
 
 print_string ("demo: 1 + 2" ^ "\n");
@@ -85,3 +86,21 @@ print_string ((pretty_print_value (run "List.tl 1")) ^ "\n");
 
 print_string ("demo: 1 * 2 + 2 * (0 :: [1 + 2, 3 + false])" ^ "\n");
 print_string ((pretty_print_value (run "1 * 2 + 2 * (0 :: [1 + 2; 3 + false])")) ^ "\n");
+
+print_string ("demo: fun x -> x + 1" ^ "\n");
+print_string ((mintype_to_string (get_type ("fun x -> x + 1"))) ^ "\n");
+
+print_string ("demo: fun x -> x && true" ^ "\n");
+print_string ((mintype_to_string (get_type ("fun x -> x && true"))) ^ "\n");
+
+print_string ("demo: fun x -> x" ^ "\n");
+print_string ((mintype_to_string (get_type ("fun x -> x"))) ^ "\n");
+
+print_string ("demo: let f = fun x -> x in if f 1 then 1 else 2" ^ "\n");
+print_string ((mintype_to_string (get_type ("let f = fun x -> x in if f 1 then 1 else 2"))) ^ "\n");
+
+print_string ("demo: let f = fun x -> x in if f true then 1 else 2" ^ "\n");
+print_string ((mintype_to_string (get_type ("let f = fun x -> x in if f true then 1 else 2"))) ^ "\n");
+
+print_string ("demo: let f = fun x -> x && true in if f 1 then 1 else 2" ^ "\n");
+print_string ((mintype_to_string (get_type ("let f = fun x -> x && true in if f 1 + 2 then 1 else 2")) ^ "\n"));

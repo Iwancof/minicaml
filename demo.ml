@@ -125,3 +125,9 @@ print_string ((pretty_print_value (run "(fun t -> fun f -> fun x -> if x then t 
 
 print_string ("demo: (fun t -> fun f -> fun x -> if x then t else f)" ^ "\n");
 print_string ((mintype_to_string (get_type ("(fun t -> fun f -> fun x -> if x then t else f)")) ^ "\n"));
+
+print_string ("demo: (fun a -> fun b -> if a < b then a else false)" ^ "\n");
+print_string ((mintype_to_string (get_type "(fun a -> fun b -> if a < b then a else false)") ^ "\n"));
+
+print_string ("demo: (fun a -> fun b -> if a < b then a else b)" ^ "\n");
+print_string ((mintype_to_string (get_type "(fun a -> fun b -> if a < b then a else b)") ^ "\n"));

@@ -47,20 +47,27 @@ let lookup_type_failable x env: mintype =
   try Hashtbl.find env x
   with Not_found -> VarTy(x)
 
-let rec solve_type x env: mintype =
+let rec solve_type_helper x env: mintype =
   match x with
   | VarTy(s) -> lookup_type_failable s env
   | IntTy | BoolTy | EmptyListTy -> x
-  | ListTy(t) -> ListTy(solve_type t env)
-  | ArrowTy(arg, ret) -> ArrowTy(solve_type arg env, solve_type ret env)
-  | BinOpTypeErr(op, l, r) -> BinOpTypeErr(op, solve_type l env, solve_type r env)
-  | UnOpTypeErr(op, v) -> UnOpTypeErr(op, solve_type v env)
-  | IfCondTypeErr(v) -> IfCondTypeErr(solve_type v env)
-  | IfArmTypeErr(t, f) -> IfArmTypeErr(solve_type t env, solve_type f env)
-  | NotAFunctionErr(f, a) -> NotAFunctionErr(solve_type f env, solve_type a env)
-  | ArgumentErr(e, a) -> ArgumentErr(solve_type e env, solve_type a env)
+  | ListTy(t) -> ListTy(solve_type_helper t env)
+  | ArrowTy(arg, ret) -> ArrowTy(solve_type_helper arg env, solve_type_helper ret env)
+  | BinOpTypeErr(op, l, r) -> BinOpTypeErr(op, solve_type_helper l env, solve_type_helper r env)
+  | UnOpTypeErr(op, v) -> UnOpTypeErr(op, solve_type_helper v env)
+  | IfCondTypeErr(v) -> IfCondTypeErr(solve_type_helper v env)
+  | IfArmTypeErr(t, f) -> IfArmTypeErr(solve_type_helper t env, solve_type_helper f env)
+  | NotAFunctionErr(f, a) -> NotAFunctionErr(solve_type_helper f env, solve_type_helper a env)
+  | ArgumentErr(e, a) -> ArgumentErr(solve_type_helper e env, solve_type_helper a env)
   | UnboundErr(s) -> UnboundErr(s)
   | RuntimeError(s) -> RuntimeError(s)
+
+let rec solve_type x env : mintype =
+  let solve = solve_type_helper x env in
+  if solve = x then
+    x
+  else
+    solve_type solve env
 
 let rec typeof e env =
   let typeof_inner e = typeof e env in
@@ -180,7 +187,7 @@ let rec typeof e env =
     ignore(break_ext env arg append);
     let exp_type = typeof_inner exp in
     let ret = ArrowTy(append, exp_type) in
-    solve_type ret env
+     solve_type ret env
   )
   | LetRec(fname, arg, body, follow) -> (
     let arg = let n = new_typevar arg in ignore(break_ext env arg n); n in

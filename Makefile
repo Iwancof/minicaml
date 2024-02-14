@@ -2,7 +2,7 @@ SRC= syntax.ml type.ml myparser.mly mylexer.mll eval.ml main.ml
 COMPONENT= syntax.ml type.ml myparser.mli myparser.ml mylexer.ml eval.ml main.ml 
 INTERPRETER= syntax.ml type.ml myparser.mli myparser.ml mylexer.ml eval.ml
 TARGET= miniocaml
-TESTS= test_expression test_environment test_parse_and_run test_function test_recursive_function test_type_err test_list test_type_checker
+TESTS= test_expression test_environment test_parse_and_run test_function test_recursive_function test_type_err test_list test_type_checker test_type_inference
 
 .DEFAULT_GOAL := $(TARGET)
 .PHONY: clean $(TESTS)

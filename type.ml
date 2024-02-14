@@ -43,9 +43,13 @@ let lookup_type x env: mintype =
   try Hashtbl.find env x
   with Not_found -> UnboundErr(x)
 
+let lookup_type_failable x env: mintype =
+  try Hashtbl.find env x
+  with Not_found -> VarTy(x)
+
 let rec solve_type x env: mintype =
   match x with
-  | VarTy(s) -> lookup_type s env
+  | VarTy(s) -> lookup_type_failable s env
   | IntTy | BoolTy | EmptyListTy -> x
   | ListTy(t) -> ListTy(solve_type t env)
   | ArrowTy(arg, ret) -> ArrowTy(solve_type arg env, solve_type ret env)
@@ -127,7 +131,8 @@ let rec typeof e env =
             tt
           else
             match (tt, ft) with
-            | (VarTy(s), VarTy(r)) -> failwith "The case of both are VarTy is not implemented yet"
+            (* | (VarTy(s), VarTy(r)) -> failwith "The case of both are VarTy is not implemented yet" *)
+            (* | (VarTy(s), VarTy(r)) -> ignore(break_ext env s IntTy); ignore(break_ext env r IntTy); IntTy (* Assume that the type of both are int *) *)
             | (VarTy(s), r) -> ignore(break_ext env s r); r
             | (l, VarTy(s)) -> ignore(break_ext env s l); l
             | (t, f) -> IfArmTypeErr(t, f)
